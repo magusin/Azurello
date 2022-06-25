@@ -12,8 +12,10 @@ git push
 git pull *=> récupérer l'état actuel*
 
 ### Branch
-git checkout -b nombranch *=> se déplacer ou créer la branche si elle n'existe pas*
+git checkout -b <branch> *=> créer et se déplace sur la nouvelle branche*
+git checkout <branch> *=> se déplace sur la branche*
 git branch (-av) *=> liste les branches*
-git branch -D nombranch *=> supprime une branche local* 
-git push gitprojetssh --delete nomdelabranch *=> supprime une branche distante*
+git branch -D <branch> *=> supprime une branche en local*
+git branch --delete --remotes <remote>/<branch> *=> supprime le suivis local*
+git push gitprojetssh --delete <branch> *=> supprime une branche distante dans git*
 
