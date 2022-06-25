@@ -19,3 +19,10 @@ git branch -D <branch> *=> supprime une branche en local*
 git branch --delete --remotes <remote>/<branch> *=> supprime le suivis local*
 git push gitprojetssh --delete <branch> *=> supprime une branche distante dans git*
 
+## Base de donnée
+*renseigner les info de la bdd sur le .ENV*
+bin/console doctrine:database:create *=> créer la base de donnée*
+bin/console make:entity *=> créer l'entité en fonction du schéma UML*
+*gérer les relations*
+bin/console make:migration *=> créer le fichier de la migration*
+bin/console doctrine:migration:migrate *=> update la base de donnée avec le fichier migration*
