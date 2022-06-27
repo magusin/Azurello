@@ -9,4 +9,5 @@
 /var/
 /vendor/
 /composer.lock
+/migrations/
 ###< symfony/framework-bundle ###
