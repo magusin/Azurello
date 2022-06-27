@@ -5,48 +5,26 @@ namespace App\Entity;
 use App\Repository\SprintRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=SprintRepository::class)
- */
+#[ORM\Entity(repositoryClass: SprintRepository::class)]
 class Sprint
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=45)
-     */
-    private $name;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $start_date;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $end_date;
+
+    #[ORM\Column(type: 'string', length: 45)]
+    private $sprint_name;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getStartDate(): ?\DateTimeInterface
@@ -69,6 +47,18 @@ class Sprint
     public function setEndDate(\DateTimeInterface $end_date): self
     {
         $this->end_date = $end_date;
+
+        return $this;
+    }
+
+    public function getSprintName(): ?string
+    {
+        return $this->sprint_name;
+    }
+
+    public function setSprintName(string $sprint_name): self
+    {
+        $this->sprint_name = $sprint_name;
 
         return $this;
     }
