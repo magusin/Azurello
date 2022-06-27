@@ -36,9 +36,6 @@ class Project
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[ORM\ManyToMany(targetEntity: UserType::class, mappedBy: 'project_id')]
-    private $userTypes_id;
-
     public function __construct()
     {
         $this->userTypes_id = new ArrayCollection();
@@ -129,33 +126,6 @@ class Project
     public function setDeletedBy(?string $deleted_by): self
     {
         $this->deleted_by = $deleted_by;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserType>
-     */
-    public function getUserTypesId(): Collection
-    {
-        return $this->userTypes_id;
-    }
-
-    public function addUserTypesId(UserType $userTypesId): self
-    {
-        if (!$this->userTypes_id->contains($userTypesId)) {
-            $this->userTypes_id[] = $userTypesId;
-            $userTypesId->addProjectId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserTypesId(UserType $userTypesId): self
-    {
-        if ($this->userTypes_id->removeElement($userTypesId)) {
-            $userTypesId->removeProjectId($this);
-        }
 
         return $this;
     }

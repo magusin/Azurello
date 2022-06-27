@@ -18,9 +18,6 @@ class UserType
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'userTypes_id')]
-    private $project_id;
-
     public function __construct()
     {
         $this->project_id = new ArrayCollection();
@@ -39,30 +36,6 @@ class UserType
     public function setLabel(string $label): self
     {
         $this->label = $label;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getProjectId(): Collection
-    {
-        return $this->project_id;
-    }
-
-    public function addProjectId(Project $projectId): self
-    {
-        if (!$this->project_id->contains($projectId)) {
-            $this->project_id[] = $projectId;
-        }
-
-        return $this;
-    }
-
-    public function removeProjectId(Project $projectId): self
-    {
-        $this->project_id->removeElement($projectId);
 
         return $this;
     }
