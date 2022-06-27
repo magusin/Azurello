@@ -9,5 +9,4 @@
 /var/
 /vendor/
 /composer.lock
-/.gitignore
 ###< symfony/framework-bundle ###
