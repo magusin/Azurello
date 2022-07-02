@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,6 +37,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $last_connection_at;
+
+    #[ORM\OneToMany(mappedBy: 'user_creator', targetEntity: Sprint::class)]
+    private $sprint_created;
+
+    #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
+    private $sprints;
+
+    public function __construct()
+    {
+        $this->sprint_created = new ArrayCollection();
+        $this->sprints = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -169,6 +183,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastConnectionAt(?\DateTimeInterface $last_connection_at): self
     {
         $this->last_connection_at = $last_connection_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sprint>
+     */
+    public function getSprintCreated(): Collection
+    {
+        return $this->sprint_created;
+    }
+
+    public function addSprintCreated(Sprint $sprintCreated): self
+    {
+        if (!$this->sprint_created->contains($sprintCreated)) {
+            $this->sprint_created[] = $sprintCreated;
+            $sprintCreated->setUserCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSprintCreated(Sprint $sprintCreated): self
+    {
+        if ($this->sprint_created->removeElement($sprintCreated)) {
+            // set the owning side to null (unless already changed)
+            if ($sprintCreated->getUserCreator() === $this) {
+                $sprintCreated->setUserCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sprint>
+     */
+    public function getSprints(): Collection
+    {
+        return $this->sprints;
+    }
+
+    public function addSprint(Sprint $sprint): self
+    {
+        if (!$this->sprints->contains($sprint)) {
+            $this->sprints[] = $sprint;
+            $sprint->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSprint(Sprint $sprint): self
+    {
+        if ($this->sprints->removeElement($sprint)) {
+            $sprint->removeUser($this);
+        }
 
         return $this;
     }
