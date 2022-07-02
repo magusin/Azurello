@@ -41,7 +41,7 @@ class GroupTask
     {
         if (!$this->grouptasks->contains($grouptask)) {
             $this->grouptasks[] = $grouptask;
-            $grouptask->setGroupTask($this);
+            // $grouptask->setGroupTask($this);
         }
 
         return $this;
@@ -51,9 +51,9 @@ class GroupTask
     {
         if ($this->grouptasks->removeElement($grouptask)) {
             // set the owning side to null (unless already changed)
-            if ($grouptask->getGroupTask() === $this) {
-                $grouptask->setGroupTask(null);
-            }
+            // if ($grouptask->getGroupTask() === $this) {
+            //     $grouptask->setGroupTask(null);
+            // }
         }
 
         return $this;
