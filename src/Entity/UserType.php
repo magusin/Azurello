@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserTypeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserTypeRepository::class)]
@@ -15,6 +17,11 @@ class UserType
 
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
+
+    public function __construct()
+    {
+        $this->project_id = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

@@ -1,5 +1,6 @@
 # Azurello
 
+
 ## **Installation du projet :** 
 git clone <gitprojetssh> *=> clone repos*
 composer update *=> install dépendances*
@@ -26,4 +27,6 @@ bin/console make:entity *=> créer l'entité en fonction du schéma UML*
 *gérer les relations*
 bin/console make:migration *=> créer le fichier de la migration*
 bin/console doctrine:migration:migrate *=> update la base de donnée avec le fichier migration*
+bin/console doctrine:migrations:sync-metadata-storage *=> synchroniser base de donnée*
 git push <gitprojetssh> --delete <branch> *=> supprime une branche distante dans git*
+
