@@ -30,3 +30,5 @@ bin/console doctrine:migration:migrate *=> update la base de donnée avec le fic
 bin/console doctrine:migrations:sync-metadata-storage *=> synchroniser base de donnée*
 git push <gitprojetssh> --delete <branch> *=> supprime une branche distante dans git*
 
+## Serveur
+php -S localhost:8080 -t public/ *=> lancer le serveur*

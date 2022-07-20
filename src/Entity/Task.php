@@ -34,18 +34,18 @@ class Task
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[ORM\ManyToOne(targetEntity: project::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[ORM\ManyToOne(targetEntity: user::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
     private $user;
 
-    #[ORM\ManyToOne(targetEntity: groupTask::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(targetEntity: GroupTask::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $group_task;
 
-    #[ORM\ManyToOne(targetEntity: taskStatus::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(targetEntity: TaskStatus::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $task_status;
 
@@ -138,41 +138,41 @@ class Task
         return $this;
     }
 
-    public function getProject(): ?project
-    {
-        return $this->project;
-    }
+    // public function getProject(): ?project
+    // {
+    //     return $this->project;
+    // }
 
-    public function setProject(?project $project): self
-    {
-        $this->project = $project;
+    // public function setProject(?project $project): self
+    // {
+    //     $this->project = $project;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function getUser(): ?user
-    {
-        return $this->user;
-    }
+    // public function getUser(): ?user
+    // {
+    //     return $this->user;
+    // }
 
-    public function setUser(?user $user): self
-    {
-        $this->user = $user;
+    // public function setUser(?user $user): self
+    // {
+    //     $this->user = $user;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function getGroupTask(): ?groupTask
-    {
-        return $this->group_task;
-    }
+    // public function getGroupTask(): ?groupTask
+    // {
+    //     return $this->group_task;
+    // }
 
-    public function setGroupTask(?groupTask $group_task): self
-    {
-        $this->group_task = $group_task;
+    // public function setGroupTask(?groupTask $group_task): self
+    // {
+    //     $this->group_task = $group_task;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getTaskStatus(): ?taskStatus
     {
