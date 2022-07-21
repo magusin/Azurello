@@ -6,36 +6,46 @@ use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $created_by;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $updated_by;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $deleted_at;
 
+    #[Groups(['project', 'project_details'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
+    #[Groups(['project_details'])]
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, orphanRemoval: true)]
     private $tasks;
 
