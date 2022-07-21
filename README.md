@@ -32,3 +32,10 @@ git push <gitprojetssh> --delete <branch> *=> supprime une branche distante dans
 
 ## Serveur
 php -S localhost:8080 -t public/ *=> lancer le serveur*
+
+## Problèmes rencontrés
+
+# Symfony
+
+driver not found lors d'une commande doctrine => vérifier les informations de connexion à la base de donnée dans .env. Php.ini dans php et/ou xampp décommenter ligne "extension=pdo_mysql"
+
