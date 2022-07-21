@@ -6,15 +6,18 @@ use App\Repository\GroupTaskRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GroupTaskRepository::class)]
 class GroupTask
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['group_task', 'group_task_details'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['group_task_details'])]
     #[ORM\ManyToOne(targetEntity: grouptask::class)]
     #[ORM\JoinColumn(nullable: true)]
     private $grouptasks;
