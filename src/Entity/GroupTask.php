@@ -18,7 +18,7 @@ class GroupTask
     private $id;
 
     #[Groups(['group_task_details'])]
-    #[ORM\ManyToOne(targetEntity: grouptask::class)]
+    #[ORM\ManyToOne(targetEntity: GroupTask::class)]
     #[ORM\JoinColumn(nullable: true)]
     private $grouptasks;
 
@@ -40,7 +40,7 @@ class GroupTask
         return $this->grouptasks;
     }
 
-    public function addGrouptask(Grouptask $grouptask): self
+    public function addGrouptask(GroupTask $grouptask): self
     {
         if (!$this->grouptasks->contains($grouptask)) {
             $this->grouptasks[] = $grouptask;
@@ -50,7 +50,7 @@ class GroupTask
         return $this;
     }
 
-    public function removeGrouptask(Grouptask $grouptask): self
+    public function removeGrouptask(GroupTask $grouptask): self
     {
         if ($this->grouptasks->removeElement($grouptask)) {
             // set the owning side to null (unless already changed)

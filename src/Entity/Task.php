@@ -151,48 +151,48 @@ class Task
         return $this;
     }
 
-    public function getProject(): ?project
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject(?project $project): self
+    public function setProject(?Project $project): self
     {
         $this->project = $project;
 
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getGroupTask(): ?groupTask
+    public function getGroupTask(): ?GroupTask
     {
         return $this->group_task;
     }
 
-    public function setGroupTask(?groupTask $group_task): self
+    public function setGroupTask(?GroupTask $group_task): self
     {
         $this->group_task = $group_task;
 
         return $this;
     }
 
-    public function getTaskStatus(): ?taskStatus
+    public function getTaskStatus(): ?TaskStatus
     {
         return $this->task_status;
     }
 
-    public function setTaskStatus(?taskStatus $task_status): self
+    public function setTaskStatus(?TaskStatus $task_status): self
     {
         $this->task_status = $task_status;
 
