@@ -16,17 +16,17 @@ class UserProject
     private $id;
 
     #[Groups(['user_project_details'])] 
-    #[ORM\ManyToOne(targetEntity: user::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
     #[Groups(['user_project_details'])] 
-    #[ORM\ManyToOne(targetEntity: project::class)]
+    #[ORM\ManyToOne(targetEntity: Project::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
     #[Groups(['user_project_details'])] 
-    #[ORM\ManyToOne(targetEntity: usertype::class)]
+    #[ORM\ManyToOne(targetEntity: UserType::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $user_type;
 
@@ -35,36 +35,36 @@ class UserProject
         return $this->id;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getProject(): ?project
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject(?project $project): self
+    public function setProject(?Project $project): self
     {
         $this->project = $project;
 
         return $this;
     }
 
-    public function getUserType(): ?usertype
+    public function getUserType(): ?UserType
     {
         return $this->user_type;
     }
 
-    public function setUserType(?usertype $user_type): self
+    public function setUserType(?UserType $user_type): self
     {
         $this->user_type = $user_type;
 

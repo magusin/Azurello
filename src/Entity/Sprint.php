@@ -30,12 +30,12 @@ class Sprint
     private $sprint_name;
 
     #[Groups(['sprint_details'])]
-    #[ORM\ManyToOne(targetEntity: user::class, inversedBy: 'sprint_created')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sprint_created')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_creator;
 
     #[Groups(['sprint_details'])]
-    #[ORM\ManyToMany(targetEntity: user::class, inversedBy: 'sprints')]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sprints')]
     private $user;
 
     public function __construct()
@@ -84,12 +84,12 @@ class Sprint
         return $this;
     }
 
-    public function getUserCreator(): ?user
+    public function getUserCreator(): ?User
     {
         return $this->user_creator;
     }
 
-    public function setUserCreator(?user $user_creator): self
+    public function setUserCreator(?User $user_creator): self
     {
         $this->user_creator = $user_creator;
 
@@ -104,7 +104,7 @@ class Sprint
         return $this->user;
     }
 
-    public function addUser(user $user): self
+    public function addUser(User $user): self
     {
         if (!$this->user->contains($user)) {
             $this->user[] = $user;
@@ -113,7 +113,7 @@ class Sprint
         return $this;
     }
 
-    public function removeUser(user $user): self
+    public function removeUser(User $user): self
     {
         $this->user->removeElement($user);
 
