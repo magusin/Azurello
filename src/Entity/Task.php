@@ -4,47 +4,60 @@ namespace App\Entity;
 
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $created_by;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $updated_by;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $deleted_at;
 
+    #[Groups(['task', 'task_details'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
+    #[Groups(['task_details'])] 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
+    #[Groups(['task_details'])] 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
     private $user;
 
+    #[Groups(['task_details'])] 
     #[ORM\ManyToOne(targetEntity: GroupTask::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $group_task;
 
+    #[Groups(['task_details'])] 
     #[ORM\ManyToOne(targetEntity: TaskStatus::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $task_status;
@@ -138,41 +151,41 @@ class Task
         return $this;
     }
 
-    // public function getProject(): ?project
-    // {
-    //     return $this->project;
-    // }
+    public function getProject(): ?project
+    {
+        return $this->project;
+    }
 
-    // public function setProject(?project $project): self
-    // {
-    //     $this->project = $project;
+    public function setProject(?project $project): self
+    {
+        $this->project = $project;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function getUser(): ?user
-    // {
-    //     return $this->user;
-    // }
+    public function getUser(): ?user
+    {
+        return $this->user;
+    }
 
-    // public function setUser(?user $user): self
-    // {
-    //     $this->user = $user;
+    public function setUser(?user $user): self
+    {
+        $this->user = $user;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function getGroupTask(): ?groupTask
-    // {
-    //     return $this->group_task;
-    // }
+    public function getGroupTask(): ?groupTask
+    {
+        return $this->group_task;
+    }
 
-    // public function setGroupTask(?groupTask $group_task): self
-    // {
-    //     $this->group_task = $group_task;
+    public function setGroupTask(?groupTask $group_task): self
+    {
+        $this->group_task = $group_task;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getTaskStatus(): ?taskStatus
     {
