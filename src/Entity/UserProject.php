@@ -11,21 +11,21 @@ class UserProject
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['user_Project', 'user_project_details'])] 
+    #[Groups(['user_project', 'user_project_details'])] 
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['user_Project_details'])] 
+    #[Groups(['user_project_details'])] 
     #[ORM\ManyToOne(targetEntity: user::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    #[Groups(['user_Project_details'])] 
+    #[Groups(['user_project_details'])] 
     #[ORM\ManyToOne(targetEntity: project::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[Groups(['user_Project_details'])] 
+    #[Groups(['user_project_details'])] 
     #[ORM\ManyToOne(targetEntity: usertype::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $user_type;
