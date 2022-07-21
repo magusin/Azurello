@@ -6,15 +6,18 @@ use App\Repository\UserTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; 
 
 #[ORM\Entity(repositoryClass: UserTypeRepository::class)]
 class UserType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['user_type', 'user_type_details'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['user_type', 'user_type_details'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
