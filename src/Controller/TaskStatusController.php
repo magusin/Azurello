@@ -18,45 +18,6 @@ class TaskStatusController extends AbstractController
     {
         $taskStatus = $taskStatusRepository->findAll();
 
-        return $this->json($taskStatusRepository->findAll());
+        return $this->json($taskStatus, Response::HTTP_OK, [], ['groups' => ['task_status_details', 'task']]); 
     }
-
-
-
-
-
-    // #[Route('/authors', name: 'app_author', methods:["HEAD", "GET"])]
-    // public function inzdex(SerializerInterface $serializer, AuthorRepository $authorRepository, Request $request): JsonResponse
-    // {
-    //     $authors = $authorRepository->findAll();
-
-    //     // -- Pseudo serialisation
-    //     // -- 
-    //     foreach ($authors as $author_key => $author)
-    //     {
-    //         $books = $author->getBooks();
-
-    //         foreach ($books as $book_key => $book)
-    //         {
-    //             $books[$book_key] = [
-    //                 'id' => $book->getId(),
-    //                 'title' => $book->getTitle(),
-    //                 'href' => $this->urlGenerator->generate('app_book_show', ['id' => $book->getId()]),
-
-    //             ];
-    //         }
-
-    //         $authors[$author_key] = [
-    //             'id' => $author->getId(),
-    //             'firstname' => $author->getFirstname(),
-    //             'lastname' => $author->getLastname(),
-    //             'books' => $books,
-    //             'href' => $this->urlGenerator->generate('app_author_show', ['id' => $author->getId()]),
-    //         ];
-    //     }
-    //     // -- 
-    //     // -- Fin Pseudo serialisation
-
-    //     return $this->json($this->response($request, $authors, "authors"));
-    // }
 }
