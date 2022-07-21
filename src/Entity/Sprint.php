@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SprintRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups; 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SprintRepository::class)]
@@ -12,22 +13,28 @@ class Sprint
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['sprint', 'sprint_details'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['sprint', 'sprint_details'])]
     #[ORM\Column(type: 'datetime')]
     private $start_date;
 
+    #[Groups(['sprint', 'sprint_details'])]
     #[ORM\Column(type: 'datetime')]
     private $end_date;
 
+    #[Groups(['sprint', 'sprint_details'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $sprint_name;
 
+    #[Groups(['sprint_details'])]
     #[ORM\ManyToOne(targetEntity: user::class, inversedBy: 'sprint_created')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_creator;
 
+    #[Groups(['sprint_details'])]
     #[ORM\ManyToMany(targetEntity: user::class, inversedBy: 'sprints')]
     private $user;
 
