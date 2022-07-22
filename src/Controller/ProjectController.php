@@ -24,7 +24,7 @@ class ProjectController extends AbstractController
     #[Route('/projects', name: 'project_list', methods: ["HEAD", "GET"])]
     public function projectList(): JsonResponse
     {
-        $project = $this->projectRepository->findAll();
+        $project = $this->projectRepository->findBy("deleted_at");
 
         return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project']);
     }
