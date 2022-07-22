@@ -101,18 +101,31 @@ class ProjectController extends AbstractController
     }
 
 
-    /* Delete Project */
+    /* Soft Delete Project */
     #[Route('/project/{id}', name: 'delete_project', methods: ["DELETE"])]
-    public function deleteProject(int $id): JsonResponse
+    public function deleteProject(Request $request, int $id): JsonResponse
     {
+
+        $data = json_decode($request->getContent(), true);
+
         $project = $this->projectRepository->find($id);
  
+         /* Check JSON body */
+         if (
+            empty($data["deleted_by"])
+        ) {
+            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+        }
+
+
         /* Check if project exists */
         if (!$project) {
             return $this->json('No project found for id ' . $id, Response::HTTP_BAD_REQUEST);
         }
  
-        $this->projectRepository->remove($project, true);
+        $project->setDeletedAt(new DateTime());
+        $project->setDeletedBy($data["deleted_by"]);
+        $this->projectRepository->add($project, true);
  
         return $this->json($project, Response::HTTP_ACCEPTED);
     }
