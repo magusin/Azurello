@@ -45,7 +45,7 @@ class Project
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['task'])]
+    #[Groups(['project_task'])]
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, orphanRemoval: true)]
     private $tasks;
 

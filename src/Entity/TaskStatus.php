@@ -6,18 +6,22 @@ use App\Repository\TaskStatusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TaskStatusRepository::class)]
 class TaskStatus
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['taskStatus'])] 
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['taskStatus'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
+    #[Groups(['taskStatus_task'])] 
     #[ORM\OneToMany(mappedBy: 'task_status', targetEntity: Task::class, orphanRemoval: true)]
     private $tasks;
 

@@ -13,11 +13,11 @@ class GroupTask
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['group_task', 'group_task_details'])]
+    #[Groups(['groupTask'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['group_task_details'])]
+    #[Groups(['groupTask_GroupTask'])]
     #[ORM\ManyToOne(targetEntity: GroupTask::class)]
     #[ORM\JoinColumn(nullable: true)]
     private $grouptasks;

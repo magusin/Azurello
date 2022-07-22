@@ -13,11 +13,11 @@ class UserType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['user_type', 'user_type_details'])]
+    #[Groups(['userType'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['user_type', 'user_type_details'])]
+    #[Groups(['userType'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 

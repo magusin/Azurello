@@ -13,28 +13,28 @@ class Sprint
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['sprint', 'sprint_details'])]
+    #[Groups(['sprint'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['sprint', 'sprint_details'])]
+    #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
     private $start_date;
 
-    #[Groups(['sprint', 'sprint_details'])]
+    #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
     private $end_date;
 
-    #[Groups(['sprint', 'sprint_details'])]
+    #[Groups(['sprint'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $sprint_name;
 
-    #[Groups(['sprint_details'])]
+    #[Groups(['sprint_user'])]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sprint_created')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_creator;
 
-    #[Groups(['sprint_details'])]
+    #[Groups(['sprint_user'])]
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sprints')]
     private $user;
 

@@ -15,47 +15,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private $email;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'json')]
     private $roles = [];
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'string')]
     private $password;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'string', length: 40)]
     private $firstname;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'string', length: 40)]
     private $lastname;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'datetime')]
     private $registration_at;
 
-    #[Groups(['user', 'user_details'])]
+    #[Groups(['user'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $last_connection_at;
 
-    #[Groups(['user_details'])]
+    #[Groups(['user_sprint'])]
     #[ORM\OneToMany(mappedBy: 'user_creator', targetEntity: Sprint::class)]
     private $sprint_created;
 
-    #[Groups(['user_details'])]
+    #[Groups(['user_sprint'])]
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private $sprints;
 
-    #[Groups(['user_details'])]
+    #[Groups(['user_task'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private $tasks;
 

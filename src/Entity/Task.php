@@ -43,21 +43,21 @@ class Task
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['project'])] 
+    #[Groups(['task_project'])] 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[Groups(['user'])] 
+    #[Groups(['task_user'])] 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
     private $user;
 
-    #[Groups(['group_task'])] 
+    #[Groups(['task_groupTask'])] 
     #[ORM\ManyToOne(targetEntity: GroupTask::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $group_task;
 
-    #[Groups(['task_status'])] 
+    #[Groups(['task_taskStatus'])] 
     #[ORM\ManyToOne(targetEntity: TaskStatus::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
     private $task_status;
