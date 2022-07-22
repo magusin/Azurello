@@ -57,7 +57,7 @@ class ProjectRepository extends ServiceEntityRepository
 //    public function findOneBySomeField($value): ?Project
 //    {
 //        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
+//            ->andWhere('p.id = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()
