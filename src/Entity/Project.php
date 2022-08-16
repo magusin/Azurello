@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\ProjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -45,14 +45,14 @@ class Project
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['project_task'])]
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, orphanRemoval: true)]
-    private $tasks;
+    #[Groups(['project_userStory'])]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: UserStory::class, orphanRemoval: true)]
+    private $user_stories;
 
     public function __construct()
     {
         $this->userTypes_id = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
+        $this->user_stories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,29 +145,29 @@ class Project
     }
 
     /**
-     * @return Collection<int, Task>
+     * @return Collection<int, UserStory>
      */
-    public function getTasks(): Collection
+    public function getUserStories(): Collection
     {
-        return $this->tasks;
+        return $this->user_stories;
     }
 
-    public function addTask(Task $task): self
+    public function addUserStory(UserStory $user_story): self
     {
-        if (!$this->tasks->contains($task)) {
-            $this->tasks[] = $task;
-            $task->setProject($this);
+        if (!$this->user_stories->contains($user_story)) {
+            $this->user_stories[] = $user_story;
+            $user_story->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeUserStory(UserStory $user_story): self
     {
-        if ($this->tasks->removeElement($task)) {
+        if ($this->user_stories->removeElement($user_story)) {
             // set the owning side to null (unless already changed)
-            if ($task->getProject() === $this) {
-                $task->setProject(null);
+            if ($user_story->getProject() === $this) {
+                $user_story->setProject(null);
             }
         }
 
