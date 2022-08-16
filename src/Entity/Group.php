@@ -22,6 +22,9 @@ class Group
     #[ORM\JoinColumn(nullable: true)]
     private $groups;
 
+    #[ORM\Column(length: 45)]
+    private $Name = null;
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -58,6 +61,18 @@ class Group
             //     $group->setGroup(null);
             // }
         }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->Name;
+    }
+
+    public function setName(string $Name): self
+    {
+        $this->Name = $Name;
 
         return $this;
     }

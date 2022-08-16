@@ -38,9 +38,14 @@ class Sprint
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sprints')]
     private $user;
 
+    #[Groups(['sprint_userStory'])] 
+    #[ORM\ManyToMany(targetEntity: UserStory::class, mappedBy: 'sprints')]
+    private $user_stories;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
+        $this->userstories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,7 +102,7 @@ class Sprint
     }
 
     /**
-     * @return Collection<int, user>
+     * @return Collection<int, User>
      */
     public function getUser(): Collection
     {
@@ -116,6 +121,33 @@ class Sprint
     public function removeUser(User $user): self
     {
         $this->user->removeElement($user);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStory>
+     */
+    public function getUserStories(): Collection
+    {
+        return $this->user_stories;
+    }
+
+    public function addUserStory(Userstory $user_story): self
+    {
+        if (!$this->user_stories->contains($user_story)) {
+            $this->user_stories->add($user_story);
+            $user_story->addSprint($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserstory(Userstory $user_story): self
+    {
+        if ($this->user_stories->removeElement($user_story)) {
+            $user_story->removeSprint($this);
+        }
 
         return $this;
     }

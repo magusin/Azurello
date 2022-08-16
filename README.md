@@ -22,6 +22,7 @@ git push gitprojetssh --delete <branch> *=> supprime une branche distante dans g
 
 ## Base de donnée
 *renseigner les info de la bdd sur le .ENV*
+bin/console doctrine:database:drop --force => supprimer la base de donnée
 bin/console doctrine:database:create *=> créer la base de donnée*
 bin/console make:entity *=> créer l'entité en fonction du schéma UML*
 *gérer les relations*
