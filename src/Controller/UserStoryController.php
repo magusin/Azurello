@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\UserStory;
+use App\Repository\ProjectRepository;
+use App\Repository\StatusRepository;
 use DateTime;
 use App\Repository\UserStoryRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,10 +16,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserStoryController extends AbstractController
 {
     private $userStoryRepository;
+    private $projectRepository;
+    private $statusRepository;
 
-    public function __construct(UserStoryRepository $userStoryRepository)
+    public function __construct(UserStoryRepository $userStoryRepository, ProjectRepository $projectRepository, StatusRepository $statusRepository)
     {
         $this->userStoryRepository = $userStoryRepository;
+        $this->projectRepository = $projectRepository;
+        $this->statusRepository = $statusRepository;
     }
 
     /* List all userStory */
@@ -65,19 +71,32 @@ class UserStoryController extends AbstractController
 
         // Check JSON body
         if (
+            empty($data["status_id"]) ||
+            empty($data["project_id"]) ||
             empty($data["name"]) ||
             empty($data["created_by"])
         ) {
             return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
         }
+        $status = $this->statusRepository->find($data["status_id"]);
+        $project = $this->projectRepository->find($data["project_id"]);
 
+         // Check if project exists
+        if (!$project) {
+            return $this->json("No project found", Response::HTTP_BAD_REQUEST);
+        }
+        if (!$status) {
+            return $this->json("No status found", Response::HTTP_BAD_REQUEST);
+        }
         $userStory = new UserStory();
         $userStory->setName($data["name"]);
+        $userStory->setProject($project);
+        $userStory->setStatus($status);
         $userStory->setCreatedAt(new DateTime());
         $userStory->setCreatedBy($data["created_by"]);
         $this->userStoryRepository->add($userStory, true);
 
-        return $this->json($userStory, Response::HTTP_CREATED);
+        return $this->json($userStory, Response::HTTP_CREATED, [], ['groups' => ['userStory', 'userStory_status', 'status', 'userStory_group', 'group','userStory_project', 'project']]);
     }
 
 }
