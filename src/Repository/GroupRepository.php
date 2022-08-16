@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\GroupTask;
+use App\Entity\Group;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<GroupTask>
+ * @extends ServiceEntityRepository<Group>
  *
- * @method GroupTask|null find($id, $lockMode = null, $lockVersion = null)
- * @method GroupTask|null findOneBy(array $criteria, array $orderBy = null)
- * @method GroupTask[]    findAll()
- * @method GroupTask[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Group|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Group|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Group[]    findAll()
+ * @method Group[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class GroupTaskRepository extends ServiceEntityRepository
+class GroupRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, GroupTask::class);
+        parent::__construct($registry, Group::class);
     }
 
-    public function add(GroupTask $entity, bool $flush = false): void
+    public function add(Group $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class GroupTaskRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(GroupTask $entity, bool $flush = false): void
+    public function remove(Group $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class GroupTaskRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return GroupTask[] Returns an array of GroupTask objects
+//     * @return Group[] Returns an array of Group objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class GroupTaskRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?GroupTask
+//    public function findOneBySomeField($value): ?Group
 //    {
 //        return $this->createQueryBuilder('g')
 //            ->andWhere('g.exampleField = :val')

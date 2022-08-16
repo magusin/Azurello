@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Task;
+use App\Entity\UserStory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Task>
+ * @extends ServiceEntityRepository<UserStory>
  *
- * @method Task|null find($id, $lockMode = null, $lockVersion = null)
- * @method Task|null findOneBy(array $criteria, array $orderBy = null)
- * @method Task[]    findAll()
- * @method Task[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserStory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserStory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserStory[]    findAll()
+ * @method UserStory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TaskRepository extends ServiceEntityRepository
+class UserStoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Task::class);
+        parent::__construct($registry, UserStory::class);
     }
 
-    public function add(Task $entity, bool $flush = false): void
+    public function add(UserStory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TaskRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Task $entity, bool $flush = false): void
+    public function remove(UserStory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class TaskRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Task[] Returns an array of Task objects
+//     * @return UserStory[] Returns an array of UserStory objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class TaskRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Task
+//    public function findOneBySomeField($value): ?UserStory
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')

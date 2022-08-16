@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\TaskStatus;
+use App\Entity\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<TaskStatus>
+ * @extends ServiceEntityRepository<Status>
  *
- * @method TaskStatus|null find($id, $lockMode = null, $lockVersion = null)
- * @method TaskStatus|null findOneBy(array $criteria, array $orderBy = null)
- * @method TaskStatus[]    findAll()
- * @method TaskStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Status|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Status|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Status[]    findAll()
+ * @method Status[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TaskStatusRepository extends ServiceEntityRepository
+class StatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TaskStatus::class);
+        parent::__construct($registry, Status::class);
     }
 
-    public function add(TaskStatus $entity, bool $flush = false): void
+    public function add(Status $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TaskStatusRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(TaskStatus $entity, bool $flush = false): void
+    public function remove(Status $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class TaskStatusRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return TaskStatus[] Returns an array of TaskStatus objects
+//     * @return Status[] Returns an array of Status objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class TaskStatusRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?TaskStatus
+//    public function findOneBySomeField($value): ?Status
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')

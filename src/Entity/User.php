@@ -55,15 +55,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private $sprints;
 
-    #[Groups(['user_task'])]
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
-    private $tasks;
+    #[Groups(['user_userStory'])]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserStory::class)]
+    private $user_stories;
 
     public function __construct()
     {
         $this->sprint_created = new ArrayCollection();
         $this->sprints = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
+        $this->user_stories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -222,18 +222,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Task>
+     * @return Collection<int, UserStory>
      */
-    public function getTasks(): Collection
+    public function getUserStories(): Collection
     {
-        return $this->tasks;
+        return $this->user_stories;
     }
 
-    public function addTask(Task $task): self
+    public function addUserStory(UserStory $user_story): self
     {
-        if (!$this->tasks->contains($task)) {
-            $this->tasks[] = $task;
-            $task->setUser($this);
+        if (!$this->user_stories->contains($user_story)) {
+            $this->user_stories[] = $user_story;
+            $user_story->setUser($this);
         }
 
         return $this;
@@ -251,12 +251,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeUserStory(UserStory $user_story): self
     {
-        if ($this->tasks->removeElement($task)) {
+        if ($this->user_stories->removeElement($user_story)) {
             // set the owning side to null (unless already changed)
-            if ($task->getUser() === $this) {
-                $task->setUser(null);
+            if ($user_story->getUser() === $this) {
+                $user_story->setUser(null);
             }
         }
 
