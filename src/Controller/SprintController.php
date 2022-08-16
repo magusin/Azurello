@@ -84,31 +84,29 @@ class SprintController extends AbstractController
         }
 
         $sprint = new Sprint();
-        $sprint->setSprintName($data["name"]);
+        $sprint->setName($data["name"]);
         $sprint->setUserCreator($user);
-        $sprint->setStartDate(new \DateTime($data["start_date"]));
-        $sprint->setEndDate(new \DateTime($data["end_date"]));
+        $sprint->setStartDate(new \DateTime());
+        $sprint->setEndDate(new \DateTime());
         $this->sprintRepository->add($sprint, true);
 
         return $this->json($sprint, Response::HTTP_CREATED, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
     }
+    
 
     /* Hard Delete Sprint */
     #[Route('/sprint/{id}', name: 'delete_sprint', methods: ["DELETE"])]
-    public function deleteSprint(Request $request, int $id): JsonResponse
+    public function deleteSprint(int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
         $sprint = $this->sprintRepository->find($id);
 
         // Check if project exists
         if (!$sprint) {
             return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
         }
- 
-        // $project->setDeletedAt(new DateTime());
-        // $project->setDeletedBy($data["deleted_by"]);
-        // $this->projectRepository->add($project, true);
- 
-        // return $this->json($project, Response::HTTP_ACCEPTED);
+
+        $this->sprintRepository->remove($sprint, true);
+
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
     }
 }

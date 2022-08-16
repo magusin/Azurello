@@ -18,16 +18,16 @@ class Sprint
     private $id;
 
     #[Groups(['sprint'])]
+    #[ORM\Column(type: 'string', length: 45)]
+    private $name;
+
+    #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
     private $start_date;
 
     #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
     private $end_date;
-
-    #[Groups(['sprint'])]
-    #[ORM\Column(type: 'string', length: 45)]
-    private $sprint_name;
 
     #[Groups(['sprint_user'])]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sprint_created')]
@@ -77,14 +77,14 @@ class Sprint
         return $this;
     }
 
-    public function getSprintName(): ?string
+    public function getName(): ?string
     {
-        return $this->sprint_name;
+        return $this->name;
     }
 
-    public function setSprintName(string $sprint_name): self
+    public function setName(string $name): self
     {
-        $this->sprint_name = $sprint_name;
+        $this->name = $name;
 
         return $this;
     }
