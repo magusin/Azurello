@@ -2,65 +2,65 @@
 
 namespace App\Entity;
 
-use App\Repository\TaskRepository;
+use App\Repository\UserStoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: TaskRepository::class)]
-class Task
+#[ORM\Entity(repositoryClass: UserStoryRepository::class)]
+class UserStory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $created_by;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $updated_by;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $deleted_at;
 
-    #[Groups(['task'])] 
+    #[Groups(['user_story'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['task_project'])] 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
+    #[Groups(['user_story_project'])] 
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[Groups(['task_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
+    #[Groups(['user_story_user'])] 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_stories')]
     private $user;
 
-    #[Groups(['task_groupTask'])] 
-    #[ORM\ManyToOne(targetEntity: GroupTask::class, inversedBy: 'tasks')]
+    #[Groups(['user_story_group'])] 
+    #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
-    private $group_task;
+    private $user_story_group;
 
-    #[Groups(['task_taskStatus'])] 
-    #[ORM\ManyToOne(targetEntity: TaskStatus::class, inversedBy: 'tasks')]
+    #[Groups(['user_story_status'])] 
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
-    private $task_status;
+    private $user_story_status;
 
     public function getId(): ?int
     {
@@ -175,26 +175,26 @@ class Task
         return $this;
     }
 
-    public function getGroupTask(): ?GroupTask
+    public function getGroup(): ?Group
     {
-        return $this->group_task;
+        return $this->user_story_group;
     }
 
-    public function setGroupTask(?GroupTask $group_task): self
+    public function setGroup(?Group $user_story_group): self
     {
-        $this->group_task = $group_task;
+        $this->user_story_group = $user_story_group;
 
         return $this;
     }
 
-    public function getTaskStatus(): ?TaskStatus
+    public function getStatus(): ?Status
     {
-        return $this->task_status;
+        return $this->user_story_status;
     }
 
-    public function setTaskStatus(?TaskStatus $task_status): self
+    public function setStatus(?Status $user_story_status): self
     {
-        $this->task_status = $task_status;
+        $this->user_story_status = $user_story_status;
 
         return $this;
     }
