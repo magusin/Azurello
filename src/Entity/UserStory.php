@@ -50,19 +50,14 @@ class UserStory
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[Groups(['userStory_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_stories')]
-    private $user;
-
     #[Groups(['userStory_group'])] 
     #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'user_stories')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user_story_group;
+    private $group;
 
     #[Groups(['userStory_status'])] 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user_story_status;
+    private $status;
 
     #[Groups(['userStory_sprint'])] 
     #[ORM\ManyToMany(targetEntity: sprint::class, inversedBy: 'user_stories')]
@@ -179,38 +174,26 @@ class UserStory
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getGroup(): ?Group
     {
-        return $this->user_story_group;
+        return $this->group;
     }
 
-    public function setGroup(?Group $user_story_group): self
+    public function setGroup(?Group $group): self
     {
-        $this->user_story_group = $user_story_group;
+        $this->group = $group;
 
         return $this;
     }
 
     public function getStatus(): ?Status
     {
-        return $this->user_story_status;
+        return $this->status;
     }
 
-    public function setStatus(?Status $user_story_status): self
+    public function setStatus(?Status $status): self
     {
-        $this->user_story_status = $user_story_status;
+        $this->status = $status;
 
         return $this;
     }
