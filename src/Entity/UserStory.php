@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserStoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -61,6 +63,20 @@ class UserStory
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_story_status;
+
+    #[Groups(['userStory_sprint'])] 
+    #[ORM\ManyToMany(targetEntity: sprint::class, inversedBy: 'user_stories')]
+    private $sprints;
+
+    #[Groups(['userStory_task'])] 
+    #[ORM\OneToMany(mappedBy: 'user_story', targetEntity: Task::class, orphanRemoval: true)]
+    private $tasks;
+
+    public function __construct()
+    {
+        $this->sprints = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -195,6 +211,60 @@ class UserStory
     public function setStatus(?Status $user_story_status): self
     {
         $this->user_story_status = $user_story_status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sprint>
+     */
+    public function getSprint(): Collection
+    {
+        return $this->sprints;
+    }
+
+    public function addSprint(sprint $sprint): self
+    {
+        if (!$this->sprints->contains($sprint)) {
+            $this->sprints->add($sprint);
+        }
+
+        return $this;
+    }
+
+    public function removeSprint(sprint $sprint): self
+    {
+        $this->sprints->removeElement($sprint);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): self
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setUserStory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): self
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getUserStory() === $this) {
+                $task->setUserStory(null);
+            }
+        }
 
         return $this;
     }
