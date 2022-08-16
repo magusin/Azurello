@@ -11,53 +11,53 @@ class UserStory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'string', length: 45)]
     private $created_by;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $updated_by;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $deleted_at;
 
-    #[Groups(['user_story'])] 
+    #[Groups(['userStory'])] 
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['user_story_project'])] 
+    #[Groups(['userStory_project'])] 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
-    #[Groups(['user_story_user'])] 
+    #[Groups(['userStory_user'])] 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_stories')]
     private $user;
 
-    #[Groups(['user_story_group'])] 
+    #[Groups(['userStory_group'])] 
     #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_story_group;
 
-    #[Groups(['user_story_status'])] 
+    #[Groups(['userStory_status'])] 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
     private $user_story_status;
