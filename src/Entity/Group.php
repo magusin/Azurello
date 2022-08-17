@@ -17,13 +17,16 @@ class Group
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['group'])]
+    #[ORM\Column(length: 45)]
+    private $name;
+
     #[Groups(['group_group'])]
     #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(nullable: true)]
     private $groups;
 
-    #[ORM\Column(length: 45)]
-    private $Name = null;
+
 
     public function __construct()
     {
@@ -67,12 +70,12 @@ class Group
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }

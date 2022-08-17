@@ -147,7 +147,7 @@ class TaskController extends AbstractController
             return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
         }
 
-        $this->statusRepository->remove($task, true);
+        $this->taskRepository->remove($task, true);
 
         return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
     }
