@@ -12,7 +12,7 @@ class Task
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[Groups(['task'])] 
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     #[Groups(['task'])]
