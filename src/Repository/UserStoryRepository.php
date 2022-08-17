@@ -39,6 +39,14 @@ class UserStoryRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllNotDeleted(): array
+    {
+        $qb = $this->createQueryBuilder('userStory');
+        return $qb->select('userStory')
+            ->where($qb->expr()->isNull("userStory.deleted_by"))
+            ->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return UserStory[] Returns an array of UserStory objects
 //     */
