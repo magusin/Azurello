@@ -55,7 +55,7 @@ class Status
     /**
      * @return Collection<int, UserStory>
      */
-    public function getUserStory(): Collection
+    public function getUserStories(): Collection
     {
         return $this->user_stories;
     }

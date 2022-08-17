@@ -43,7 +43,7 @@ class StatusController extends AbstractController
     }
 
 
-    /* Create project */
+    /* Create status */
     #[Route('/status', name: 'create_status', methods: ["POST"])]
     public function createStatus(Request $request): JsonResponse
     {
@@ -63,7 +63,6 @@ class StatusController extends AbstractController
         return $this->json($status, Response::HTTP_CREATED, [], ['groups' => ['status', 'status_userStory', 'task', 'userStory', 'status_task']]);
     }
 
-
     /* Edit Status */
     #[Route('status/{id}', name: 'edit_status', methods: ["PATCH"])]
     public function editStatus(Request $request, int $id): JsonResponse
@@ -71,20 +70,34 @@ class StatusController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $status = $this->statusRepository->find($id);
 
-        // Check JSON body
-        if (
-            empty($data["status"])
-        ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+
+            // Check if status exists
+            if (!$status) {
+                return $this->json("No status found", Response::HTTP_BAD_REQUEST);
+            }
+
+        if (!empty($data["label"])) {
+            $status->setLabel($data["label"]);
         }
 
-        // Check if status exists
+        $this->statusRepository->add($status, true);
+
+        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status', 'status_task', 'status_userStory', 'userStory', 'task']]);
+    }
+
+    /* Hard Delete Status */
+    #[Route('/status/{id}', name: 'delete_status', methods: ["DELETE"])]
+    public function deleteStatus(int $id): JsonResponse
+    {
+        $status = $this->statusRepository->find($id);
+    
+        // Check if project exists
         if (!$status) {
             return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
         }
-        $status->setLabel($data["label"]);
-        $this->statusRepository->add($status, true);
-
-        return $this->json($status, Response::HTTP_OK);
-    } 
+    
+        $this->statusRepository->remove($status, true);
+    
+        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status', 'status_userStory', 'userStory', 'status_task', 'task']]);
+    }
 }
