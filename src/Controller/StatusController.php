@@ -2,22 +2,89 @@
 
 namespace App\Controller;
 
-// use App\Entity\TaskStatus;
-// use App\Repository\TaskStatusRepository;
-// use Symfony\Component\HttpFoundation\Request;
-// use Symfony\Component\Routing\Annotation\Route;
-// use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Status;
+use App\Repository\StatusRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-// use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class StatusController extends AbstractController
 {
-    // #[Route('/taskstatus', name: 'app_task_status')]
-    // public function index(TaskStatusRepository $taskStatusRepository, Request $request): JsonResponse
-    // {
-    //     $taskStatus = $taskStatusRepository->findAll();
+    private $statusRepository;
 
-    //     return $this->json($taskStatus, Response::HTTP_OK, [], ['groups' => ['task_status_details', 'task']]); 
-    // }
+    public function __construct(StatusRepository $statusRepository)
+    {
+        $this->statusRepository = $statusRepository;
+    }
+
+    /* List all Status */
+    #[Route('/status', name: 'status', methods: ["HEAD", "GET"])]
+    public function listStatus(): JsonResponse
+    {
+        $status = $this->statusRepository->findAll();
+
+        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status',  'status_userStory', 'status_task', 'task', 'userStory']]);
+    }
+
+
+    /* Specific status details */
+    #[Route('/status/{id}', name: 'status_detail', methods: ["HEAD", "GET"])]
+    public function status(int $id): JsonResponse
+    {
+        $status = $this->statusRepository->find($id);
+
+        // Check if status exists
+        if (!$status) {
+            return $this->json("No status found", Response::HTTP_BAD_REQUEST);
+        }
+        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status',  'status_userStory', 'task', 'userStory', 'status_task']]);
+    }
+
+
+    /* Create project */
+    #[Route('/status', name: 'create_status', methods: ["POST"])]
+    public function createStatus(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Check JSON body
+        if (
+            empty($data["label"])
+        ) {
+            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+        }
+
+        $status = new Status();
+        $status->setLabel($data["label"]);
+        $this->statusRepository->add($status, true);
+
+        return $this->json($status, Response::HTTP_CREATED, [], ['groups' => ['status', 'status_userStory', 'task', 'userStory', 'status_task']]);
+    }
+
+
+    /* Edit Status */
+    #[Route('status/{id}', name: 'edit_status', methods: ["PATCH"])]
+    public function editStatus(Request $request, int $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $status = $this->statusRepository->find($id);
+
+        // Check JSON body
+        if (
+            empty($data["status"])
+        ) {
+            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if status exists
+        if (!$status) {
+            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+        }
+        $status->setLabel($data["label"]);
+        $this->statusRepository->add($status, true);
+
+        return $this->json($status, Response::HTTP_OK);
+    } 
 }

@@ -15,6 +15,10 @@ class Task
     #[ORM\Column]
     private $id;
 
+    #[Groups(['task'])]
+    #[ORM\Column(length: 45)]
+    private $name;
+
     #[Groups(['task_userStory'])] 
     #[ORM\ManyToOne(targetEntity: UserStory::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
@@ -28,9 +32,6 @@ class Task
     #[Groups(['task_user'])] 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
     private $user;
-
-    #[ORM\Column(length: 45)]
-    private $name ;
 
     public function getId(): ?int
     {

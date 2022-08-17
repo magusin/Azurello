@@ -60,7 +60,7 @@ class UserStory
     private $status;
 
     #[Groups(['userStory_sprint'])] 
-    #[ORM\ManyToMany(targetEntity: sprint::class, inversedBy: 'user_stories')]
+    #[ORM\ManyToMany(targetEntity: Sprint::class, inversedBy: 'user_stories')]
     private $sprints;
 
     #[Groups(['userStory_task'])] 
