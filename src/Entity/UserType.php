@@ -21,9 +21,14 @@ class UserType
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
-    #[ORM\ManyToOne(inversedBy: 'userTypes')]
+    #[Groups(['userType_project'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userTypes')]
     #[ORM\JoinColumn(nullable: false)]
     private $project_owner;
+
+    #[Groups(['userType_userProject'])] 
+    #[ORM\OneToMany(mappedBy:"user_type" ,targetEntity: UserProject::class)]
+    private $user_project;
 
     public function __construct()
     {
@@ -55,6 +60,38 @@ class UserType
     public function setProjectOwner(?Project $project_owner): self
     {
         $this->project_owner = $project_owner;
+
+        return $this;
+    }
+
+    
+
+    /**
+     * @return Collection<int, UserProject>
+     */
+    public function getUserProject(): Collection
+    {
+        return $this->user_project;
+    }
+
+    public function addUserProject(UserProject $user_project): self
+    {
+        if (!$this->user_project->contains($user_project)) {
+            $this->user_project->add($user_project);
+            $user_project->setUserType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserProject(UserProject $user_project): self
+    {
+        if ($this->user_project->removeElement($user_project)) {
+            // set the owning side to null (unless already changed)
+            if ($user_project->getUserType() === $this) {
+                $user_project->setUserType(null);
+            }
+        }
 
         return $this;
     }
