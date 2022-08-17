@@ -36,7 +36,7 @@ class ProjectController extends AbstractController
     {
         $project = $this->projectRepository->findAllNotDeleted();
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_task', 'task']]);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
     }
 
 
@@ -50,13 +50,13 @@ class ProjectController extends AbstractController
         if (!$project) {
             return $this->json("No project found", Response::HTTP_BAD_REQUEST);
         }
-        
+
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
             return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_task', 'task', 'task_taskStatus', 'task_status']]);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
     }
 
 
@@ -80,7 +80,7 @@ class ProjectController extends AbstractController
         $project->setCreatedBy($data["created_by"]);
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_CREATED);
+        return $this->json($project, Response::HTTP_CREATED, [], ['groups' => ['project']]);
     }
 
 
@@ -93,7 +93,6 @@ class ProjectController extends AbstractController
 
         // Check JSON body
         if (
-            empty($data["name"]) ||
             empty($data["updated_by"])
         ) {
             return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
@@ -109,12 +108,15 @@ class ProjectController extends AbstractController
             return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
         }
 
-        $project->setName($data["name"]);
-        $project->setUpdatedAt(new DateTime());
+        if (!empty($data["name"])) {
+            $project->setName($data["name"]);
+        }
         $project->setUpdatedBy($data["updated_by"]);
+        $project->setUpdatedAt(new DateTime());
+
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_OK);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
     }
 
 
@@ -124,7 +126,7 @@ class ProjectController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $project = $this->projectRepository->find($id);
- 
+
         // Check JSON body
         if (
             empty($data["deleted_by"])
@@ -141,12 +143,11 @@ class ProjectController extends AbstractController
         if ($project->getDeletedBy(!null)) {
             return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
         }
- 
+
         $project->setDeletedAt(new DateTime());
         $project->setDeletedBy($data["deleted_by"]);
         $this->projectRepository->add($project, true);
- 
-        return $this->json($project, Response::HTTP_ACCEPTED);
+
+        return $this->json($project, Response::HTTP_ACCEPTED, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
     }
- 
 }

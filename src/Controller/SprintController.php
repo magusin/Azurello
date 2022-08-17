@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Sprint;
 use App\Repository\SprintRepository;
 use App\Repository\UserRepository;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-
 
 class SprintController extends AbstractController
 {
@@ -56,7 +54,7 @@ class SprintController extends AbstractController
             return $this->json("No sprint found", Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user', 'sprint_userStory', 'userStory']]);
     }
 
 
@@ -86,13 +84,41 @@ class SprintController extends AbstractController
         $sprint = new Sprint();
         $sprint->setName($data["name"]);
         $sprint->setUserCreator($user);
-        $sprint->setStartDate(new \DateTime());
-        $sprint->setEndDate(new \DateTime());
+        $sprint->setStartDate(new \DateTime($data['start_date']));
+        $sprint->setEndDate(new \DateTime($data['end_date']));
         $this->sprintRepository->add($sprint, true);
 
         return $this->json($sprint, Response::HTTP_CREATED, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
     }
-    
+
+
+    /* Edit Sprint */
+    #[Route('sprint/{id}', name: 'edit_sprint', methods: ["PATCH"])]
+    public function editSprint(Request $request, int $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $sprint = $this->sprintRepository->find($id);
+
+        // Check if sprint exists
+        if (!$sprint) {
+            return $this->json("No sprint found", Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!empty($data["name"])) {
+            $sprint->setName($data["name"]);
+        }
+        if (!empty($data["start_date"])) {
+            $sprint->setStartDate(new \DateTime($data['start_date']));
+        }
+        if (!empty($data["end_date"])) {
+            $sprint->setEndDate(new \DateTime($data['end_date']));
+        }
+        
+        $this->sprintRepository->add($sprint, true);
+
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
+    }
+
 
     /* Hard Delete Sprint */
     #[Route('/sprint/{id}', name: 'delete_sprint', methods: ["DELETE"])]
@@ -107,6 +133,6 @@ class SprintController extends AbstractController
 
         $this->sprintRepository->remove($sprint, true);
 
-        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint']]);
     }
 }
