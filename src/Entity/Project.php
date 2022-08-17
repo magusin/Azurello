@@ -49,10 +49,14 @@ class Project
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: UserStory::class, orphanRemoval: true)]
     private $user_stories;
 
+    #[ORM\OneToMany(mappedBy: 'project_owner', targetEntity: UserType::class)]
+    private $userTypes;
+
     public function __construct()
     {
         $this->userTypes_id = new ArrayCollection();
         $this->user_stories = new ArrayCollection();
+        $this->userTypes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -168,6 +172,36 @@ class Project
             // set the owning side to null (unless already changed)
             if ($user_story->getProject() === $this) {
                 $user_story->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserType>
+     */
+    public function getUserTypes(): Collection
+    {
+        return $this->userTypes;
+    }
+
+    public function addUserType(UserType $userType): self
+    {
+        if (!$this->userTypes->contains($userType)) {
+            $this->userTypes->add($userType);
+            $userType->setProjectOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserType(UserType $userType): self
+    {
+        if ($this->userTypes->removeElement($userType)) {
+            // set the owning side to null (unless already changed)
+            if ($userType->getProjectOwner() === $this) {
+                $userType->setProjectOwner(null);
             }
         }
 

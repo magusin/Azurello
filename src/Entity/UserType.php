@@ -21,6 +21,10 @@ class UserType
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
+    #[ORM\ManyToOne(inversedBy: 'userTypes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $project_owner;
+
     public function __construct()
     {
         $this->project_id = new ArrayCollection();
@@ -39,6 +43,18 @@ class UserType
     public function setLabel(string $label): self
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    public function getProjectOwner(): ?Project
+    {
+        return $this->project_owner;
+    }
+
+    public function setProjectOwner(?Project $project_owner): self
+    {
+        $this->project_owner = $project_owner;
 
         return $this;
     }
