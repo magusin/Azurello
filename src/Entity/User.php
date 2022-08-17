@@ -55,10 +55,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private $sprints;
 
-    #[Groups(['user_userStory'])]
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserStory::class)]
-    private $user_stories;
-
     #[Groups(['user_task'])]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private $tasks;
@@ -226,42 +222,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserStory>
-     */
-    public function getUserStories(): Collection
-    {
-        return $this->user_stories;
-    }
-
-    public function addUserStory(UserStory $user_story): self
-    {
-        if (!$this->user_stories->contains($user_story)) {
-            $this->user_stories[] = $user_story;
-            $user_story->setUser($this);
-        }
-
-        return $this;
-    }
-
     public function removeSprintCreated(Sprint $sprintCreated): self
     {
         if ($this->sprint_created->removeElement($sprintCreated)) {
             // set the owning side to null (unless already changed)
             if ($sprintCreated->getUserCreator() === $this) {
                 $sprintCreated->setUserCreator(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function removeUserStory(UserStory $user_story): self
-    {
-        if ($this->user_stories->removeElement($user_story)) {
-            // set the owning side to null (unless already changed)
-            if ($user_story->getUser() === $this) {
-                $user_story->setUser(null);
             }
         }
 

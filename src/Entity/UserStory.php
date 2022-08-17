@@ -67,10 +67,6 @@ class UserStory
     #[ORM\OneToMany(mappedBy: 'user_story', targetEntity: Task::class, orphanRemoval: true)]
     private $tasks;
 
-    #[Groups(['userStory_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_stories')]
-    private $user;
-
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
@@ -205,7 +201,7 @@ class UserStory
     /**
      * @return Collection<int, Sprint>
      */
-    public function getSprint(): Collection
+    public function getSprints(): Collection
     {
         return $this->sprints;
     }
@@ -252,18 +248,6 @@ class UserStory
                 $task->setUserStory(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }
