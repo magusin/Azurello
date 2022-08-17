@@ -25,7 +25,7 @@ class StatusController extends AbstractController
     {
         $status = $this->statusRepository->findAll();
 
-        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status',  'status_userStory', 'status_task', 'task', 'userStory']]);
+        return $this->json($status, Response::HTTP_OK, [], ['groups' => ['status',  'status_userStory', 'userStory', 'status_task', 'task',]]);
     }
 
 
