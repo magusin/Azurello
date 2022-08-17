@@ -48,10 +48,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $last_connection_at;
 
     #[Groups(['user_sprint'])]
-    #[ORM\OneToMany(mappedBy: 'user_creator', targetEntity: Sprint::class)]
-    private $sprint_created;
-
-    #[Groups(['user_sprint'])]
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private $sprints;
 
@@ -200,36 +196,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastConnectionAt(?\DateTimeInterface $last_connection_at): self
     {
         $this->last_connection_at = $last_connection_at;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Sprint>
-     */
-    public function getSprintCreated(): Collection
-    {
-        return $this->sprint_created;
-    }
-
-    public function addSprintCreated(Sprint $sprintCreated): self
-    {
-        if (!$this->sprint_created->contains($sprintCreated)) {
-            $this->sprint_created[] = $sprintCreated;
-            $sprintCreated->setUserCreator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSprintCreated(Sprint $sprintCreated): self
-    {
-        if ($this->sprint_created->removeElement($sprintCreated)) {
-            // set the owning side to null (unless already changed)
-            if ($sprintCreated->getUserCreator() === $this) {
-                $sprintCreated->setUserCreator(null);
-            }
-        }
 
         return $this;
     }

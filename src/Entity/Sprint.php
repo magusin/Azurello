@@ -30,11 +30,6 @@ class Sprint
     private $end_date;
 
     #[Groups(['sprint_user'])]
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'sprint_created')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user_creator;
-
-    #[Groups(['sprint_user'])]
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sprints')]
     private $user;
 
@@ -85,18 +80,6 @@ class Sprint
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getUserCreator(): ?User
-    {
-        return $this->user_creator;
-    }
-
-    public function setUserCreator(?User $user_creator): self
-    {
-        $this->user_creator = $user_creator;
 
         return $this;
     }

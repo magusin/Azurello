@@ -67,23 +67,14 @@ class SprintController extends AbstractController
         // Check JSON body
         if (
             empty($data["name"]) ||
-            empty($data["user_creator_id"]) ||
             empty($data["start_date"]) ||
             empty($data["end_date"])
         ) {
             return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->userRepository->find($data["user_creator_id"]);
-
-        // Check if user exists
-        if (!$user) {
-            return $this->json("No user found", Response::HTTP_BAD_REQUEST);
-        }
-
         $sprint = new Sprint();
         $sprint->setName($data["name"]);
-        $sprint->setUserCreator($user);
         $sprint->setStartDate(new \DateTime($data['start_date']));
         $sprint->setEndDate(new \DateTime($data['end_date']));
         $this->sprintRepository->add($sprint, true);
