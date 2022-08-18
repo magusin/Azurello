@@ -45,18 +45,33 @@ class Project
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['project_userStory'])]
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: UserStory::class, orphanRemoval: true)]
-    private $user_stories;
+    #[Groups(['project_userType'])]
+    #[ORM\OneToMany(targetEntity: UserType::class, mappedBy: "project")]
+    private Collection $user_types;
 
-    #[ORM\OneToMany(mappedBy: 'project_owner', targetEntity: UserType::class)]
-    private $userTypes;
+    #[Groups(['project_group'])]
+    #[ORM\OneToMany(targetEntity: Group::class, mappedBy: "project")]
+    private Collection $groups;
+
+    #[Groups(['project_status'])]
+    #[ORM\OneToMany(targetEntity: Status::class, mappedBy: "project")]
+    private Collection $status;
+
+    #[Groups(['project_sprint'])]
+    #[ORM\OneToMany(targetEntity: Sprint::class, mappedBy: "project")]
+    private Collection $sprints;
+
+    #[Groups(['project_userProject'])]
+    #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: "project")]
+    private Collection $user_projects;
 
     public function __construct()
     {
-        $this->userTypes_id = new ArrayCollection();
-        $this->user_stories = new ArrayCollection();
-        $this->userTypes = new ArrayCollection();
+        $this->user_types = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->status = new ArrayCollection();
+        $this->sprints = new ArrayCollection();
+        $this->user_projects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,29 +164,29 @@ class Project
     }
 
     /**
-     * @return Collection<int, UserStory>
+     * @return Collection<int, UserType>
      */
-    public function getUserStories(): Collection
+    public function getUserType(): Collection
     {
-        return $this->user_stories;
+        return $this->user_types;
     }
 
-    public function addUserStory(UserStory $user_story): self
+    public function addUserType(UserType $user_type): self
     {
-        if (!$this->user_stories->contains($user_story)) {
-            $this->user_stories[] = $user_story;
-            $user_story->setProject($this);
+        if (!$this->user_types->contains($user_type)) {
+            $this->user_types->add($user_type);
+            $user_type->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeUserStory(UserStory $user_story): self
+    public function removeUserType(UserType $user_type): self
     {
-        if ($this->user_stories->removeElement($user_story)) {
+        if ($this->user_types->removeElement($user_type)) {
             // set the owning side to null (unless already changed)
-            if ($user_story->getProject() === $this) {
-                $user_story->setProject(null);
+            if ($user_type->getProject() === $this) {
+                $user_type->setProject(null);
             }
         }
 
@@ -179,29 +194,119 @@ class Project
     }
 
     /**
-     * @return Collection<int, UserType>
+     * @return Collection<int, Group>
      */
-    public function getUserTypes(): Collection
+    public function getGroups(): Collection
     {
-        return $this->userTypes;
+        return $this->groups;
     }
 
-    public function addUserType(UserType $userType): self
+    public function addGroup(Group $group): self
     {
-        if (!$this->userTypes->contains($userType)) {
-            $this->userTypes->add($userType);
-            $userType->setProjectOwner($this);
+        if (!$this->groups->contains($group)) {
+            $this->groups->add($group);
+            $group->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeUserType(UserType $userType): self
+    public function removeGroup(Group $group): self
     {
-        if ($this->userTypes->removeElement($userType)) {
+        if ($this->groups->removeElement($group)) {
             // set the owning side to null (unless already changed)
-            if ($userType->getProjectOwner() === $this) {
-                $userType->setProjectOwner(null);
+            if ($group->getProject() === $this) {
+                $group->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Status>
+     */
+    public function getStatus(): Collection
+    {
+        return $this->status;
+    }
+
+    public function addStatus(Status $status): self
+    {
+        if (!$this->status->contains($status)) {
+            $this->status->add($status);
+            $status->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatus(Status $status): self
+    {
+        if ($this->status->removeElement($status)) {
+            // set the owning side to null (unless already changed)
+            if ($status->getProject() === $this) {
+                $status->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserProject>
+     */
+    public function getUserProjects(): Collection
+    {
+        return $this->user_projects;
+    }
+
+    public function addUserProject(UserProject $user_project): self
+    {
+        if (!$this->user_projects->contains($user_project)) {
+            $this->user_projects->add($user_project);
+            $user_project->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserProject(UserProject $user_project): self
+    {
+        if ($this->user_projects->removeElement($user_project)) {
+            // set the owning side to null (unless already changed)
+            if ($user_project->getProject() === $this) {
+                $user_project->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sprint>
+     */
+    public function getSprints(): Collection
+    {
+        return $this->sprints;
+    }
+
+    public function addSprint(Sprint $sprint): self
+    {
+        if (!$this->sprints->contains($sprint)) {
+            $this->sprints->add($sprint);
+            $sprint->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSprint(Sprint $sprint): self
+    {
+        if ($this->sprints->removeElement($sprint)) {
+            // set the owning side to null (unless already changed)
+            if ($sprint->getProject() === $this) {
+                $sprint->setProject(null);
             }
         }
 

@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use App\Context\ControllerContext;
 use App\Entity\Group;
 use App\Repository\GroupRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class GroupController extends AbstractController
+class GroupController extends ControllerContext
 {
     private $groupRepository;
 
@@ -19,16 +19,16 @@ class GroupController extends AbstractController
         $this->groupRepository = $groupRepository;
     }
 
-    /* List all Group */
+    /* List all groups */
     #[Route('/groups', name: 'group_list', methods: ["HEAD", "GET"])]
-    public function taskList(): JsonResponse
+    public function groupList(): JsonResponse
     {
         $group = $this->groupRepository->findAll();
 
-        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
+        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group']]);
     }
 
-    /* List all groups on details */
+    /* List all groups in details */
     #[Route('/groups_details', name: 'group_list_details', methods: ["HEAD", "GET"])]
     public function groupListDetails(): JsonResponse
     {
@@ -37,20 +37,20 @@ class GroupController extends AbstractController
         return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
     }
 
-    /* Specific grouo details */
+    /* Specific group details */
     #[Route('/group/{id}', name: 'group', methods: ["HEAD", "GET"])]
     public function group(int $id): JsonResponse
     {
         $group = $this->groupRepository->find($id);
 
-        // Check if task exists
+        // Check if group exists
         if (!$group) {
-            return $this->json("No task found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
         }
         return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
     }
 
-    /* Create task */
+    /* Create group */
     #[Route('/group', name: 'create_group', methods: ["POST"])]
     public function createGroup(Request $request): JsonResponse
     {
@@ -60,7 +60,7 @@ class GroupController extends AbstractController
         if (
             empty($data["name"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         $group = new Group();
@@ -70,8 +70,8 @@ class GroupController extends AbstractController
         return $this->json($group, Response::HTTP_CREATED, [],  ['groups' => ['group']]);
     }
 
-    
-    /* Edit Task */
+
+    /* Edit group */
     #[Route('group/{id}', name: 'edit_group', methods: ["PATCH"])]
     public function editGroup(Request $request, int $id): JsonResponse
     {
@@ -80,7 +80,7 @@ class GroupController extends AbstractController
 
         // Check if group exists
         if (!$group) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
         }
 
         if (!empty($data["name"])) {
@@ -91,7 +91,7 @@ class GroupController extends AbstractController
             $group_group = $this->groupRepository->find($data["group_group"]);
             // Check if group group exists
             if (!$group_group) {
-                return $this->json("No group group found", Response::HTTP_BAD_REQUEST);
+                return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
             }
             $group->addGroup($group_group);
         }
@@ -101,19 +101,19 @@ class GroupController extends AbstractController
         return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
     }
 
-     /* Hard Delete Group */
-     #[Route('/group/{id}', name: 'delete_group', methods: ["DELETE"])]
-     public function deleteGroup(int $id): JsonResponse
-     {
-         $group = $this->groupRepository->find($id);
- 
-         // Check if task exists
-         if (!$group) {
-             return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
-         }
- 
-         $this->groupRepository->remove($group, true);
- 
-         return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
-     }
+    /* Hard delete group */
+    #[Route('/group/{id}', name: 'delete_group', methods: ["DELETE"])]
+    public function deleteGroup(int $id): JsonResponse
+    {
+        $group = $this->groupRepository->find($id);
+
+        // Check if group exists
+        if (!$group) {
+            return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->groupRepository->remove($group, true);
+
+        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
+    }
 }

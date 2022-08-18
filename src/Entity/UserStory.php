@@ -45,27 +45,22 @@ class UserStory
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['userStory_project'])] 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_stories')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $project;
-
     #[Groups(['userStory_group'])] 
     #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'user_stories')]
-    private $group;
+    private Group $group;
 
     #[Groups(['userStory_status'])] 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
     #[ORM\JoinColumn(nullable: false)]
-    private $status;
+    private Status $status;
 
     #[Groups(['userStory_sprint'])] 
     #[ORM\ManyToMany(targetEntity: Sprint::class, inversedBy: 'user_stories')]
-    private $sprints;
+    private Collection $sprints;
 
     #[Groups(['userStory_task'])] 
-    #[ORM\OneToMany(mappedBy: 'user_story', targetEntity: Task::class, orphanRemoval: true)]
-    private $tasks;
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user_story')]
+    private Collection $tasks;
 
     public function __construct()
     {
@@ -158,18 +153,6 @@ class UserStory
     public function setDeletedBy(?string $deleted_by): self
     {
         $this->deleted_by = $deleted_by;
-
-        return $this;
-    }
-
-    public function getProject(): ?Project
-    {
-        return $this->project;
-    }
-
-    public function setProject(?Project $project): self
-    {
-        $this->project = $project;
 
         return $this;
     }

@@ -49,18 +49,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user_sprint'])]
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
-    private $sprints;
+    private Collection $sprints;
 
     #[Groups(['user_task'])]
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
-    private $tasks;
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user')]
+    private Collection $tasks;
+
+    #[Groups(['user_userProject'])]
+    #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: 'user')]
+    private Collection $user_projects;
 
     public function __construct()
     {
-        $this->sprint_created = new ArrayCollection();
         $this->sprints = new ArrayCollection();
-        $this->user_stories = new ArrayCollection();
         $this->tasks = new ArrayCollection();
+        $this->user_projects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,11 +106,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $user_roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $user_roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return array_unique($user_roles);
     }
 
     public function setRoles(array $roles): self
@@ -251,6 +254,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($task->getUser() === $this) {
                 $task->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserProject>
+     */
+    public function getUserProjects(): Collection
+    {
+        return $this->user_projects;
+    }
+
+    public function addUserProject(UserProject $user_project): self
+    {
+        if (!$this->user_projects->contains($user_project)) {
+            $this->user_projects->add($user_project);
+            $user_project->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserProject(UserProject $user_project): self
+    {
+        if ($this->user_projects->removeElement($user_project)) {
+            // set the owning side to null (unless already changed)
+            if ($user_project->getUser() === $this) {
+                $user_project->setUser(null);
             }
         }
 

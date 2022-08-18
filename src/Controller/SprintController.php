@@ -2,24 +2,21 @@
 
 namespace App\Controller;
 
+use App\Context\ControllerContext;
 use App\Entity\Sprint;
 use App\Repository\SprintRepository;
-use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class SprintController extends AbstractController
+class SprintController extends ControllerContext
 {
     private $sprintRepository;
-    private $userRepository;
 
-    public function __construct(SprintRepository $sprintRepository, UserRepository $userRepository)
+    public function __construct(SprintRepository $sprintRepository)
     {
         $this->sprintRepository = $sprintRepository;
-        $this->userRepository = $userRepository;
     }
 
 
@@ -51,10 +48,14 @@ class SprintController extends AbstractController
 
         // Check if sprint exists
         if (!$sprint) {
-            return $this->json("No sprint found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("sprint"), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user', 'sprint_userStory', 'userStory']]);
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => [
+            'sprint',
+            'sprint_user', 'user',
+            'sprint_userStory', 'userStory'
+        ]]);
     }
 
 
@@ -70,7 +71,7 @@ class SprintController extends AbstractController
             empty($data["start_date"]) ||
             empty($data["end_date"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         $sprint = new Sprint();
@@ -79,7 +80,10 @@ class SprintController extends AbstractController
         $sprint->setEndDate(new \DateTime($data['end_date']));
         $this->sprintRepository->add($sprint, true);
 
-        return $this->json($sprint, Response::HTTP_CREATED, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
+        return $this->json($sprint, Response::HTTP_CREATED, [], ['groups' => [
+            'sprint',
+            'sprint_user', 'user'
+        ]]);
     }
 
 
@@ -92,7 +96,7 @@ class SprintController extends AbstractController
 
         // Check if sprint exists
         if (!$sprint) {
-            return $this->json("No sprint found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("sprint"), Response::HTTP_BAD_REQUEST);
         }
 
         if (!empty($data["name"])) {
@@ -104,10 +108,13 @@ class SprintController extends AbstractController
         if (!empty($data["end_date"])) {
             $sprint->setEndDate(new \DateTime($data['end_date']));
         }
-        
+
         $this->sprintRepository->add($sprint, true);
 
-        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint', 'sprint_user', 'user']]);
+        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => [
+            'sprint',
+            'sprint_user', 'user'
+        ]]);
     }
 
 
@@ -119,7 +126,7 @@ class SprintController extends AbstractController
 
         // Check if project exists
         if (!$sprint) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("sprint"), Response::HTTP_BAD_REQUEST);
         }
 
         $this->sprintRepository->remove($sprint, true);

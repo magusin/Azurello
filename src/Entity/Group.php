@@ -21,12 +21,20 @@ class Group
     #[ORM\Column(length: 45)]
     private $name;
 
+    // TODO 
     #[Groups(['group_group'])]
     #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(nullable: true)]
     private $groups;
 
+    #[Groups(['group_project'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'groups')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Project $project;
 
+    #[Groups(['group_userStory'])]
+    #[ORM\OneToMany(targetEntity: UserStory::class, mappedBy: 'group')]
+    private Collection $user_stories;
 
     public function __construct()
     {
@@ -36,6 +44,18 @@ class Group
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -68,14 +88,44 @@ class Group
         return $this;
     }
 
-    public function getName(): ?string
+    public function getProject(): ?Project
     {
-        return $this->name;
+        return $this->project;
     }
 
-    public function setName(string $name): self
+    public function setProject(?Project $project): self
     {
-        $this->name = $name;
+        $this->project = $project;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStory>
+     */
+    public function getUserStories(): Collection
+    {
+        return $this->user_stories;
+    }
+
+    public function addUserStory(UserStory $user_story): self
+    {
+        if (!$this->user_stories->contains($user_story)) {
+            $this->user_stories->add($user_story);
+            $user_story->setGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserStory(UserStory $user_story): self
+    {
+        if ($this->user_stories->removeElement($user_story)) {
+            // set the owning side to null (unless already changed)
+            if ($user_story->getGroup() === $this) {
+                $user_story->setGroup(null);
+            }
+        }
 
         return $this;
     }
