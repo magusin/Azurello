@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Context\ControllerContext;
 use App\Entity\Status;
+use App\Repository\ProjectRepository;
 use App\Repository\StatusRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,10 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 class StatusController extends ControllerContext
 {
     private $statusRepository;
+    private $projectRepository;
 
-    public function __construct(StatusRepository $statusRepository)
-    {
+    public function __construct(
+        StatusRepository $statusRepository,
+        ProjectRepository $projectRepository,
+    ) {
         $this->statusRepository = $statusRepository;
+        $this->projectRepository = $projectRepository;
     }
 
     /* List all Status */
@@ -29,7 +34,7 @@ class StatusController extends ControllerContext
     }
 
 
-    /* List all Status */
+    /* List all Status in details*/
     #[Route('/status_details', name: 'status_list_details', methods: ["HEAD", "GET"])]
     public function listStatusDetails(): JsonResponse
     {
@@ -37,8 +42,7 @@ class StatusController extends ControllerContext
 
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
-            'status_userStory', 'userStory',
-            'status_task', 'task'
+            'status_project', 'project'
         ]]);
     }
 
@@ -56,7 +60,8 @@ class StatusController extends ControllerContext
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
             'status_task', 'task',
-            'status_userStory', 'userStory'
+            'status_userStory', 'userStory',
+            'status_project', 'project'
         ]]);
     }
 
@@ -69,20 +74,30 @@ class StatusController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["label"])
+            empty($data["label"]) ||
+            empty($data["project_id"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if project is not deleted
+        if ($project->getDeletedBy(!null)) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
         $status = new Status();
         $status->setLabel($data["label"]);
+        $status->setProject($project);
         $this->statusRepository->add($status, true);
 
-        return $this->json($status, Response::HTTP_CREATED, [], ['groups' => [
-            'status',
-            'status_userStory', 'userStory',
-            'status_task', 'task'
-        ]]);
+        return $this->json($status, Response::HTTP_CREATED, [], ['groups' => ['status']]);
     }
 
     /* Edit Status */
@@ -91,7 +106,6 @@ class StatusController extends ControllerContext
     {
         $data = json_decode($request->getContent(), true);
         $status = $this->statusRepository->find($id);
-
 
         // Check if status exists
         if (!$status) {
@@ -106,8 +120,7 @@ class StatusController extends ControllerContext
 
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
-            'status_userStory', 'userStory',
-            'status_task', 'task'
+            'status_project', 'project'
         ]]);
     }
 
@@ -127,7 +140,8 @@ class StatusController extends ControllerContext
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
             'status_userStory', 'userStory',
-            'status_task', 'task'
+            'status_task', 'task',
+            'status_project', 'project'
         ]]);
     }
 }

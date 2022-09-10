@@ -49,9 +49,9 @@ class Project
     #[ORM\OneToMany(targetEntity: UserType::class, mappedBy: "project")]
     private Collection $user_types;
 
-    #[Groups(['project_group'])]
-    #[ORM\OneToMany(targetEntity: Group::class, mappedBy: "project")]
-    private Collection $groups;
+    #[Groups(['project_userStoryGroup'])]
+    #[ORM\OneToMany(targetEntity: UserStoryGroup::class, mappedBy: "project")]
+    private Collection $user_story_groups;
 
     #[Groups(['project_status'])]
     #[ORM\OneToMany(targetEntity: Status::class, mappedBy: "project")]
@@ -68,7 +68,7 @@ class Project
     public function __construct()
     {
         $this->user_types = new ArrayCollection();
-        $this->groups = new ArrayCollection();
+        $this->user_story_groups = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->sprints = new ArrayCollection();
         $this->user_projects = new ArrayCollection();
@@ -166,7 +166,7 @@ class Project
     /**
      * @return Collection<int, UserType>
      */
-    public function getUserType(): Collection
+    public function getUserTypes(): Collection
     {
         return $this->user_types;
     }
@@ -196,27 +196,27 @@ class Project
     /**
      * @return Collection<int, Group>
      */
-    public function getGroups(): Collection
+    public function getUserStoryGroups(): Collection
     {
-        return $this->groups;
+        return $this->user_story_groups;
     }
 
-    public function addGroup(Group $group): self
+    public function addUserStoryGroup(UserStoryGroup $userStoryGroup): self
     {
-        if (!$this->groups->contains($group)) {
-            $this->groups->add($group);
-            $group->setProject($this);
+        if (!$this->user_story_groups->contains($userStoryGroup)) {
+            $this->user_story_groups->add($userStoryGroup);
+            $userStoryGroup->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeGroup(Group $group): self
+    public function removeUserStoryGroup(UserStoryGroup $userStoryGroup): self
     {
-        if ($this->groups->removeElement($group)) {
+        if ($this->user_story_groups->removeElement($userStoryGroup)) {
             // set the owning side to null (unless already changed)
-            if ($group->getProject() === $this) {
-                $group->setProject(null);
+            if ($userStoryGroup->getProject() === $this) {
+                $userStoryGroup->setProject(null);
             }
         }
 

@@ -48,7 +48,7 @@ class UserStoryController extends ControllerContext
 
         return $this->json($userStory, Response::HTTP_OK, [], ['groups' => [
             'userStory',
-            'userStory_group', 'group',
+            'userStory_userStoryGroup', 'userStoryGroup',
             'userStory_status', 'status',
             'userStory_sprint', 'sprint'
         ]]);
@@ -73,7 +73,7 @@ class UserStoryController extends ControllerContext
 
         return $this->json($userStory, Response::HTTP_OK, [], ['groups' => [
             'userStory',
-            'userStory_group', 'group',
+            'userStory_userStoryGroup', 'userStoryGroup',
             'userStory_status', 'status',
             'userStory_sprint', 'sprint'
         ]]);
@@ -111,7 +111,7 @@ class UserStoryController extends ControllerContext
         return $this->json($userStory, Response::HTTP_CREATED, [], ['groups' => [
             'userStory',
             'userStory_status', 'status',
-            'userStory_group', 'group',
+            'userStory_userStoryGroup', 'userStoryGroup',
             'userStory_project', 'project'
         ]]);
     }
@@ -151,7 +151,7 @@ class UserStoryController extends ControllerContext
         return $this->json($userStory, Response::HTTP_OK, [], ['groups' => [
             'userStory',
             'userStory_status', 'status',
-            'userStory_group', 'group',
+            'userStory_userStoryGroup', 'userStoryGroup',
             'userStory_project', 'project'
         ]]);
     }
@@ -188,7 +188,7 @@ class UserStoryController extends ControllerContext
         return $this->json($userStory, Response::HTTP_ACCEPTED, [], ['groups' => [
             'userStory',
             'userStory_status', 'status',
-            'userStory_group', 'group',
+            'userStory_userStoryGroup', 'userStoryGroup',
             'userStory_project', 'project'
         ]]);
     }

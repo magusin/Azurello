@@ -45,9 +45,9 @@ class UserStory
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deleted_by;
 
-    #[Groups(['userStory_group'])] 
-    #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'user_stories')]
-    private Group $group;
+    #[Groups(['userStory_userStoryGroup'])] 
+    #[ORM\ManyToOne(targetEntity: UserStoryGroup::class, inversedBy: 'user_stories')]
+    private UserStoryGroup $user_story_group;
 
     #[Groups(['userStory_status'])] 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'user_stories')]
@@ -157,14 +157,14 @@ class UserStory
         return $this;
     }
 
-    public function getGroup(): ?Group
+    public function getUserStoryGroup(): ?UserStoryGroup
     {
-        return $this->group;
+        return $this->user_story_group;
     }
 
-    public function setGroup(?Group $group): self
+    public function setUserStoryGroup(?UserStoryGroup $userStoryGroup): self
     {
-        $this->group = $group;
+        $this->user_story_group = $userStoryGroup;
 
         return $this;
     }

@@ -2,43 +2,43 @@
 
 namespace App\Entity;
 
-use App\Repository\GroupRepository;
+use App\Repository\UserStoryGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: GroupRepository::class)]
-class Group
+#[ORM\Entity(repositoryClass: UserStoryGroupRepository::class)]
+class UserStoryGroup
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['group'])]
+    #[Groups(['userStoryGroup'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['group'])]
-    #[ORM\Column(length: 45)]
+    #[Groups(['userStoryGroup'])]
+    #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
     // TODO 
-    #[Groups(['group_group'])]
-    #[ORM\ManyToOne(targetEntity: Group::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private $groups;
+    // #[Groups(['group_group'])]
+    // #[ORM\ManyToOne(targetEntity: Group::class)]
+    // #[ORM\JoinColumn(nullable: true)]
+    // private $groups;
 
-    #[Groups(['group_project'])]
+    #[Groups(['userStoryGroup_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'groups')]
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
 
-    #[Groups(['group_userStory'])]
+    #[Groups(['userStoryGroup_userStory'])]
     #[ORM\OneToMany(targetEntity: UserStory::class, mappedBy: 'group')]
     private Collection $user_stories;
 
     public function __construct()
     {
-        $this->groups = new ArrayCollection();
+        $this->user_stories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -54,36 +54,6 @@ class Group
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Group>
-     */
-    public function getGroups(): Collection
-    {
-        return $this->groups;
-    }
-
-    public function addGroup(Group $group): self
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-            // $group->setGroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGroup(Group $group): self
-    {
-        if ($this->groups->removeElement($group)) {
-            // set the owning side to null (unless already changed)
-            // if ($group->getGroup() === $this) {
-            //     $group->setGroup(null);
-            // }
-        }
 
         return $this;
     }
@@ -112,7 +82,7 @@ class Group
     {
         if (!$this->user_stories->contains($user_story)) {
             $this->user_stories->add($user_story);
-            $user_story->setGroup($this);
+            $user_story->setUserStoryGroup($this);
         }
 
         return $this;
@@ -122,11 +92,12 @@ class Group
     {
         if ($this->user_stories->removeElement($user_story)) {
             // set the owning side to null (unless already changed)
-            if ($user_story->getGroup() === $this) {
-                $user_story->setGroup(null);
+            if ($user_story->getUserStoryGroup() === $this) {
+                $user_story->setUserStoryGroup(null);
             }
         }
 
         return $this;
     }
+
 }

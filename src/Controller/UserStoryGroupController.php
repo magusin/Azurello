@@ -4,28 +4,35 @@ namespace App\Controller;
 
 use App\Context\ControllerContext;
 use App\Entity\Group;
+use App\Entity\UserStoryGroup;
 use App\Repository\GroupRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\UserStoryGroupRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class GroupController extends ControllerContext
+class UserStoryGroupController extends ControllerContext
 {
-    private $groupRepository;
+    private $userStoryGroupRepository;
+    private $projectRepository;
 
-    public function __construct(GroupRepository $groupRepository)
-    {
-        $this->groupRepository = $groupRepository;
+    public function __construct(
+        UserStoryGroupRepository $userStoryGroupRepository,
+        ProjectRepository $projectRepository,
+    ) {
+        $this->userStoryGroupRepository = $userStoryGroupRepository;
+        $this->projectRepository = $projectRepository;
     }
 
     /* List all groups */
     #[Route('/groups', name: 'group_list', methods: ["HEAD", "GET"])]
     public function groupList(): JsonResponse
     {
-        $group = $this->groupRepository->findAll();
+        $userStoryGroup = $this->userStoryGroupRepository->findAll();
 
-        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group']]);
+        return $this->json($userStoryGroup, Response::HTTP_OK, [], ['groups' => ['userStoryGroup']]);
     }
 
     /* List all groups in details */
@@ -58,16 +65,24 @@ class GroupController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["name"])
+            empty($data["name"]) ||
+            empty($data['project_id'])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
-        $group = new Group();
-        $group->setName($data["name"]);
-        $this->groupRepository->add($group, true);
+        $project = $this->projectRepository->find($data["project_id"]);
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
 
-        return $this->json($group, Response::HTTP_CREATED, [],  ['groups' => ['group']]);
+        $group = new UserStoryGroup();
+        $group->setName($data["name"]);
+        $group->setProject($project);
+        $this->userProjectGroupRepository->add($group, true);
+
+        return $this->json($group, Response::HTTP_CREATED, [],  ['groups' => ['userStoryGroup']]);
     }
 
 
@@ -93,7 +108,7 @@ class GroupController extends ControllerContext
             if (!$group_group) {
                 return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
             }
-            $group->addGroup($group_group);
+            // $group->addGroup($group_group);
         }
 
         $this->groupRepository->add($group, true);

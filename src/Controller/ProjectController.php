@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Context\ControllerContext;
 use DateTime;
 use App\Entity\Project;
+use App\Context\ControllerContext;
 use App\Repository\ProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +30,7 @@ class ProjectController extends ControllerContext
     }
 
 
-    /* List all Project on details */
+    /* List all Project in details */
     #[Route('/projects_details', name: 'project_list_details', methods: ["HEAD", "GET"])]
     public function projectListDetails(): JsonResponse
     {
@@ -42,7 +42,7 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_group', 'group'
+            'project_userStoryGroup', 'userStoryGroup'
         ]]);
     }
 
@@ -69,7 +69,7 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_group', 'group'
+            'project_userStoryGroup', 'userStoryGroup'
         ]]);
     }
 
@@ -94,14 +94,7 @@ class ProjectController extends ControllerContext
         $project->setCreatedBy($data["created_by"]);
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_CREATED, [], ['groups' => [
-            'project',
-            'project_userType', 'userType',
-            'project_userProject', 'userProject',
-            'project_sprint', 'sprint',
-            'project_status', 'status',
-            'project_group', 'group'
-        ]]);
+        return $this->json($project, Response::HTTP_CREATED, [], ['groups' => ['project']]);
     }
 
 
@@ -143,7 +136,7 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_group', 'group'
+            'project_userStoryGroup', 'userStoryGroup'
         ]]);
     }
 
@@ -182,7 +175,7 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_group', 'group'
+            'project_userStoryGroup', 'userStoryGroup'
         ]]);
     }
 }
