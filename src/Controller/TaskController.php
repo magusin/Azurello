@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Context\ControllerContext;
-use DateTime;
 use App\Entity\Task;
 use App\Repository\StatusRepository;
 use App\Repository\TaskRepository;
@@ -133,7 +132,7 @@ class TaskController extends ControllerContext
             $task->setName($data["name"]);
         }
 
-        if (!empty($data["user_story"])) {
+        if (!empty($data["user_story_id"])) {
             $user_story = $this->userStoryRepository->find($data["user_story_id"]);
             // Check if user_story exists
             if (!$user_story) {
@@ -142,7 +141,7 @@ class TaskController extends ControllerContext
             $task->setUserStory($user_story);
         }
 
-        if (!empty($data["status"])) {
+        if (!empty($data["status_id"])) {
             $status = $this->statusRepository->find($data["status_id"]);
             // Check if status exists
             if (!$status) {
