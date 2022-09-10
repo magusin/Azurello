@@ -100,4 +100,43 @@ class UserTypeController extends ControllerContext
             'userType_project', 'project'
         ]]);
     }
+
+    /* Edit userType */
+    #[Route('userType/{id}', name: 'userType_edit', methods: ["PATCH"])]
+    public function editUserType(Request $request, int $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $userType = $this->userTypeRepository->find($id);
+
+        // Check if userType exists
+        if (!$userType) {
+            return $this->json($this->errorMessageEntityNotFound("userType"), Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!empty($data["label"])) {
+            $userType->setLabel($data["label"]);
+        }
+
+        $this->userTypeRepository->add($userType, true);
+
+        return $this->json($userType, Response::HTTP_OK, [], ['groups' => [
+            'userType'
+        ]]);
+    }
+
+    /* Hard Delete userType */
+    #[Route('/userType/{id}', name: 'userType_delete', methods: ["DELETE"])]
+    public function deleteUserType(int $id): JsonResponse
+    {
+        $userType = $this->userTypeRepository->find($id);
+
+        // Check if project exists
+        if (!$userType) {
+            return $this->json($this->errorMessageEntityNotFound("userType"), Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->userTypeRepository->remove($userType, true);
+
+        return $this->json($this->successEntityDeleted("userType"), Response::HTTP_OK);
+    }
 }
