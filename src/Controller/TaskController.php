@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Context\ControllerContext;
 use DateTime;
 use App\Entity\Task;
 use App\Repository\StatusRepository;
@@ -11,27 +12,31 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class TaskController extends AbstractController
+class TaskController extends ControllerContext
 {
     private $taskRepository;
     private $userStoryRepository;
+    private $statusRepository;
 
-    public function __construct(TaskRepository $taskRepository, UserStoryRepository $userStoryRepository, StatusRepository $statusRepository)
-    {
+    public function __construct(
+        TaskRepository $taskRepository,
+        UserStoryRepository $userStoryRepository,
+        StatusRepository $statusRepository
+    ) {
         $this->taskRepository = $taskRepository;
         $this->userStoryRepository = $userStoryRepository;
         $this->statusRepository = $statusRepository;
     }
 
+    
     /* List all Task */
     #[Route('/tasks', name: 'task_list', methods: ["HEAD", "GET"])]
     public function taskList(): JsonResponse
     {
         $task = $this->taskRepository->findAll();
 
-        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task']]);
     }
 
 
@@ -41,7 +46,12 @@ class TaskController extends AbstractController
     {
         $task = $this->taskRepository->findAll();
 
-        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_OK, [], ['groups' => [
+            'task',
+            'task_status', 'status',
+            'task_user', 'user',
+            'task_userStory', 'userStory'
+        ]]);
     }
 
 
@@ -53,9 +63,14 @@ class TaskController extends AbstractController
 
         // Check if task exists
         if (!$task) {
-            return $this->json("No task found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("task"), Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_OK, [], ['groups' => [
+            'task',
+            'task_status', 'status',
+            'task_user', 'user',
+            'task_userStory', 'userStory'
+        ]]);
     }
 
 
@@ -71,7 +86,7 @@ class TaskController extends AbstractController
             empty($data["user_story_id"]) ||
             empty($data["status_id"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         $user_story = $this->userStoryRepository->find($data["user_story_id"]);
@@ -79,12 +94,12 @@ class TaskController extends AbstractController
 
         // Check if user_story exists
         if (!$user_story) {
-            return $this->json("No user story found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("user_story"), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if Status exists
         if (!$status) {
-            return $this->json("No Status found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("status"), Response::HTTP_BAD_REQUEST);
         }
 
         $task = new Task();
@@ -93,7 +108,12 @@ class TaskController extends AbstractController
         $task->setStatus($status);
         $this->taskRepository->add($task, true);
 
-        return $this->json($task, Response::HTTP_CREATED, [],  ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_CREATED, [],  ['groups' => [
+            'task',
+            'task_status', 'status',
+            'task_user', 'user',
+            'task_userStory', 'userStory'
+        ]]);
     }
 
 
@@ -106,7 +126,7 @@ class TaskController extends AbstractController
 
         // Check if task exists
         if (!$task) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("task"), Response::HTTP_BAD_REQUEST);
         }
 
         if (!empty($data["name"])) {
@@ -117,7 +137,7 @@ class TaskController extends AbstractController
             $user_story = $this->userStoryRepository->find($data["user_story_id"]);
             // Check if user_story exists
             if (!$user_story) {
-                return $this->json("No user story found", Response::HTTP_BAD_REQUEST);
+                return $this->json($this->errorMessageEntityNotFound("user_story"), Response::HTTP_BAD_REQUEST);
             }
             $task->setUserStory($user_story);
         }
@@ -126,15 +146,21 @@ class TaskController extends AbstractController
             $status = $this->statusRepository->find($data["status_id"]);
             // Check if status exists
             if (!$status) {
-                return $this->json("No status found", Response::HTTP_BAD_REQUEST);
+                return $this->json($this->errorMessageEntityNotFound("status"), Response::HTTP_BAD_REQUEST);
             }
-            $task->setUserStory($status);
+            $task->setStatus($status);
         }
 
         $this->taskRepository->add($task, true);
 
-        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_OK, [], ['groups' => [
+            'task',
+            'task_status', 'status',
+            'task_user', 'user',
+            'task_userStory', 'userStory'
+        ]]);
     }
+
 
     /* Hard Delete Task */
     #[Route('/task/{id}', name: 'delete_task', methods: ["DELETE"])]
@@ -144,11 +170,16 @@ class TaskController extends AbstractController
 
         // Check if task exists
         if (!$task) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("task"), Response::HTTP_BAD_REQUEST);
         }
 
         $this->taskRepository->remove($task, true);
 
-        return $this->json($task, Response::HTTP_OK, [], ['groups' => ['task', 'task_status', 'status', 'task_user', 'user', 'task_userStory', 'userStory']]);
+        return $this->json($task, Response::HTTP_OK, [], ['groups' => [
+            'task',
+            'task_status', 'status',
+            'task_user', 'user',
+            'task_userStory', 'userStory'
+        ]]);
     }
 }

@@ -22,16 +22,16 @@ class Task
     #[Groups(['task_userStory'])] 
     #[ORM\ManyToOne(targetEntity: UserStory::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user_story;
+    private UserStory $user_story;
 
     #[Groups(['task_status'])] 
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
-    private $status;
+    private Status $status;
 
     #[Groups(['task_user'])] 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
-    private $user;
+    private User $user;
 
     public function getId(): ?int
     {

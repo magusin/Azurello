@@ -15,20 +15,20 @@ class UserProject
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['userProject_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user;
-
     #[Groups(['userProject_project'])] 
-    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_projects')]
     #[ORM\JoinColumn(nullable: false)]
-    private $project;
+    private Project $project;
 
     #[Groups(['userProject_details'])] 
-    #[ORM\ManyToOne(targetEntity: UserType::class)]
+    #[ORM\ManyToOne(targetEntity: UserType::class, inversedBy: 'user_projects')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user_type;
+    private UserType $user_type;
+
+    #[Groups(['userProject_user'])] 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_projects')]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
 
     public function getId(): ?int
     {

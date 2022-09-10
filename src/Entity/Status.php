@@ -23,11 +23,16 @@ class Status
 
     #[Groups(['status_userStory'])] 
     #[ORM\OneToMany(mappedBy: 'status', targetEntity: UserStory::class, orphanRemoval: true)]
-    private $user_stories;
+    private Collection $user_stories;
 
     #[Groups(['status_task'])]
     #[ORM\OneToMany(mappedBy: 'status', targetEntity: Task::class, orphanRemoval: true)]
-    private $tasks;
+    private Collection $tasks;
+
+    #[Groups(['status_project'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'status')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Project $project;
 
     public function __construct()
     {
@@ -63,7 +68,7 @@ class Status
     public function addUserStory(UserStory $user_story): self
     {
         if (!$this->user_stories->contains($user_story)) {
-            $this->user_stories[] = $user_story;
+            $this->user_stories->add($user_story);
             $user_story->setStatus($this);
         }
 
@@ -108,6 +113,18 @@ class Status
                 $task->setStatus(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): self
+    {
+        $this->project = $project;
 
         return $this;
     }

@@ -4,14 +4,14 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Project;
+use App\Context\ControllerContext;
 use App\Repository\ProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ProjectController extends AbstractController
+class ProjectController extends ControllerContext
 {
     private $projectRepository;
 
@@ -30,13 +30,20 @@ class ProjectController extends AbstractController
     }
 
 
-    /* List all Project on details */
+    /* List all Project in details */
     #[Route('/projects_details', name: 'project_list_details', methods: ["HEAD", "GET"])]
     public function projectListDetails(): JsonResponse
     {
         $project = $this->projectRepository->findAllNotDeleted();
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => [
+            'project',
+            'project_userType', 'userType',
+            'project_userProject', 'userProject',
+            'project_sprint', 'sprint',
+            'project_status', 'status',
+            'project_userStoryGroup', 'userStoryGroup'
+        ]]);
     }
 
 
@@ -48,15 +55,22 @@ class ProjectController extends AbstractController
 
         // Check if project exists
         if (!$project) {
-            return $this->json("No project found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
-            return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => [
+            'project',
+            'project_userType', 'userType',
+            'project_userProject', 'userProject',
+            'project_sprint', 'sprint',
+            'project_status', 'status',
+            'project_userStoryGroup', 'userStoryGroup'
+        ]]);
     }
 
 
@@ -71,7 +85,7 @@ class ProjectController extends AbstractController
             empty($data["name"]) ||
             empty($data["created_by"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         $project = new Project();
@@ -95,17 +109,17 @@ class ProjectController extends AbstractController
         if (
             empty($data["updated_by"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if project exists
         if (!$project) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
-            return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
         if (!empty($data["name"])) {
@@ -116,7 +130,14 @@ class ProjectController extends AbstractController
 
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => [
+            'project',
+            'project_userType', 'userType',
+            'project_userProject', 'userProject',
+            'project_sprint', 'sprint',
+            'project_status', 'status',
+            'project_userStoryGroup', 'userStoryGroup'
+        ]]);
     }
 
 
@@ -131,23 +152,30 @@ class ProjectController extends AbstractController
         if (
             empty($data["deleted_by"])
         ) {
-            return $this->json("JSON incorrect", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if project exists
         if (!$project) {
-            return $this->json("This id is not found", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
-            return $this->json("This project is deleted", Response::HTTP_BAD_REQUEST);
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
         $project->setDeletedAt(new DateTime());
         $project->setDeletedBy($data["deleted_by"]);
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_ACCEPTED, [], ['groups' => ['project',  'project_userStory', 'userStory']]);
+        return $this->json($project, Response::HTTP_ACCEPTED, [], ['groups' => [
+            'project',
+            'project_userType', 'userType',
+            'project_userProject', 'userProject',
+            'project_sprint', 'sprint',
+            'project_status', 'status',
+            'project_userStoryGroup', 'userStoryGroup'
+        ]]);
     }
 }
