@@ -39,22 +39,26 @@ class UserStoryGroupController extends ControllerContext
     #[Route('/groups_details', name: 'group_list_details', methods: ["HEAD", "GET"])]
     public function groupListDetails(): JsonResponse
     {
-        $group = $this->groupRepository->findAll();
+        $group = $this->userStoryGroupRepository->findAll();
 
-        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
+        return $this->json($group, Response::HTTP_OK, [], ['groups' => [
+            'userStoryGroup', 'userStoryGroup_groupChildrens'
+        ]]);
     }
 
     /* Specific group details */
     #[Route('/group/{id}', name: 'group', methods: ["HEAD", "GET"])]
     public function group(int $id): JsonResponse
     {
-        $group = $this->groupRepository->find($id);
+        $group = $this->userStoryGroupRepository->find($id);
 
         // Check if group exists
         if (!$group) {
             return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
         }
-        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
+        return $this->json($group, Response::HTTP_OK, [], ['groups' => [
+            'userStoryGroup', 'userStoryGroup_groupChildrens'
+        ]]);
     }
 
     /* Create group */
@@ -71,6 +75,7 @@ class UserStoryGroupController extends ControllerContext
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
+
         $project = $this->projectRepository->find($data["project_id"]);
         // Check if project exists
         if (!$project) {
@@ -78,9 +83,19 @@ class UserStoryGroupController extends ControllerContext
         }
 
         $group = new UserStoryGroup();
+
+        if ($data['group_parent_id']) {
+            $groupParent = $this->userStoryGroupRepository->find($data["group_parent_id"]);
+            // Check if group parent exists
+            if (!$groupParent) {
+                return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
+            }
+            $group->setGroupParent($groupParent);
+        }
+
         $group->setName($data["name"]);
         $group->setProject($project);
-        $this->userProjectGroupRepository->add($group, true);
+        $this->userStoryGroupRepository->add($group, true);
 
         return $this->json($group, Response::HTTP_CREATED, [],  ['groups' => ['userStoryGroup']]);
     }
@@ -91,7 +106,7 @@ class UserStoryGroupController extends ControllerContext
     public function editGroup(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $group = $this->groupRepository->find($id);
+        $group = $this->userStoryGroupRepository->find($id);
 
         // Check if group exists
         if (!$group) {
@@ -102,18 +117,23 @@ class UserStoryGroupController extends ControllerContext
             $group->setName($data["name"]);
         }
 
-        if (!empty($data["group_group"])) {
-            $group_group = $this->groupRepository->find($data["group_group"]);
-            // Check if group group exists
-            if (!$group_group) {
-                return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
+        if (!empty($data["group_parent_id"])) {
+            if ($data["group_parent_id"] == null) {
+            } else {
+                $groupParent = $this->userStoryGroupRepository->find($data["group_parent_id"]);
+                // Check if group parent exists
+                if (!$groupParent) {
+                    return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
+                }
+                $group->setGroupParent($groupParent);
             }
-            // $group->addGroup($group_group);
         }
 
-        $this->groupRepository->add($group, true);
+        $this->userStoryGroupRepository->add($group, true);
 
-        return $this->json($group, Response::HTTP_OK, [], ['groups' => ['group', 'group_group']]);
+        return $this->json($group, Response::HTTP_OK, [], ['groups' => [
+            'userStoryGroup', 'userStoryGroup_groupParent'
+        ]]);
     }
 
     /* Hard delete group */
