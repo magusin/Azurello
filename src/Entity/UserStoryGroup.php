@@ -21,11 +21,14 @@ class UserStoryGroup
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
-    // TODO 
-    // #[Groups(['group_group'])]
-    // #[ORM\ManyToOne(targetEntity: Group::class)]
-    // #[ORM\JoinColumn(nullable: true)]
-    // private $groups;
+    #[Groups(['userStoryGroup_groupChildrens'])]
+    #[ORM\OneToMany(targetEntity: UserStoryGroup::class, mappedBy: 'group_parent')]
+    private Collection $group_childrens;
+
+    #[Groups(['userStoryGroup_groupParent'])]
+    #[ORM\ManyToOne(targetEntity: UserStoryGroup::class, inversedBy: 'group_childrens', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private UserStoryGroup $group_parent;
 
     #[Groups(['userStoryGroup_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'groups')]
@@ -39,6 +42,7 @@ class UserStoryGroup
     public function __construct()
     {
         $this->user_stories = new ArrayCollection();
+        $this->group_childrens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -66,6 +70,48 @@ class UserStoryGroup
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getGroupParent(): ?UserStoryGroup
+    {
+        return $this->group_parent;
+    }
+
+    public function setGroupParent(?UserStoryGroup $userStoryGroup): self
+    {
+        $this->group_parent = $userStoryGroup;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStoryGroup>
+     */
+    public function getGroupChildrens(): Collection
+    {
+        return $this->group_childrens;
+    }
+
+    public function addGroupChildren(UserStoryGroup $userStoryGroup): self
+    {
+        if (!$this->group_childrens->contains($userStoryGroup)) {
+            $this->group_childrens->add($userStoryGroup);
+            $userStoryGroup->setGroupParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupChildren(UserStoryGroup $userStoryGroup): self
+    {
+        if ($this->group_childrens->removeElement($userStoryGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($userStoryGroup->getGroupParent() === $this) {
+                $userStoryGroup->setGroupParent(null);
+            }
+        }
 
         return $this;
     }
@@ -99,5 +145,4 @@ class UserStoryGroup
 
         return $this;
     }
-
 }

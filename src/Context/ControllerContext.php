@@ -2,18 +2,6 @@
 
 namespace App\Context;
 
-use App\Repository\GroupRepository;
-use App\Repository\ProjectRepository;
-use App\Repository\SprintRepository;
-use App\Repository\StatusRepository;
-use App\Repository\TaskRepository;
-use App\Repository\UserProjectRepository;
-use App\Repository\UserRepository;
-use App\Repository\UserStoryRepository;
-use App\Repository\UserTypeRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ControllerContext extends AbstractController
