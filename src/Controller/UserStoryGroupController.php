@@ -84,7 +84,7 @@ class UserStoryGroupController extends ControllerContext
 
         $group = new UserStoryGroup();
 
-        if ($data['group_parent_id']) {
+        if (!empty($data['group_parent_id'])) {
             $groupParent = $this->userStoryGroupRepository->find($data["group_parent_id"]);
             // Check if group parent exists
             if (!$groupParent) {
@@ -118,21 +118,18 @@ class UserStoryGroupController extends ControllerContext
         }
 
         if (!empty($data["group_parent_id"])) {
-            if ($data["group_parent_id"] == null) {
-            } else {
-                $groupParent = $this->userStoryGroupRepository->find($data["group_parent_id"]);
-                // Check if group parent exists
-                if (!$groupParent) {
-                    return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
-                }
-                $group->setGroupParent($groupParent);
+            $groupParent = $this->userStoryGroupRepository->find($data["group_parent_id"]);
+            // Check if group parent exists
+            if (!$groupParent) {
+                return $this->json($this->errorMessageEntityNotFound("group"), Response::HTTP_BAD_REQUEST);
             }
+            $group->setGroupParent($groupParent);
         }
 
         $this->userStoryGroupRepository->add($group, true);
 
         return $this->json($group, Response::HTTP_OK, [], ['groups' => [
-            'userStoryGroup', 'userStoryGroup_groupParent'
+            'userStoryGroup', 'userStoryGroup_groupChildrens'
         ]]);
     }
 
