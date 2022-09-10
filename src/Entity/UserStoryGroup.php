@@ -26,7 +26,7 @@ class UserStoryGroup
     private Collection $group_childrens;
 
     #[Groups(['userStoryGroup_groupParent'])]
-    #[ORM\ManyToOne(targetEntity: UserStoryGroup::class, inversedBy: 'group_childrens')]
+    #[ORM\ManyToOne(targetEntity: UserStoryGroup::class, inversedBy: 'group_childrens', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private UserStoryGroup $group_parent;
 
@@ -145,5 +145,4 @@ class UserStoryGroup
 
         return $this;
     }
-
 }
