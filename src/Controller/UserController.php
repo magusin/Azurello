@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends ControllerContext
 {
@@ -22,12 +23,14 @@ class UserController extends ControllerContext
         UserRepository $userRepository,
         TaskRepository $taskRepository,
         SprintRepository $sprintRepository,
-        UserProjectRepository $userProjectRepository
+        UserProjectRepository $userProjectRepository,
+        UserPasswordHasherInterface $hasher
     ) {
         $this->userRepository = $userRepository;
         $this->taskRepository = $taskRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
+        $this->hasher = $hasher;
     }
 
     
@@ -76,7 +79,7 @@ class UserController extends ControllerContext
 
     /* Create user */
     #[Route('/user', name: 'create_user', methods: ["POST"])]
-    public function createUser(Request $request): JsonResponse
+    public function createUser(Request $request, UserPasswordHasherInterface $hasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -95,10 +98,14 @@ class UserController extends ControllerContext
         if (!empty($data["roles"])) {
             $user->setRoles($data["roles"]);
         }
-        $user->setPassword($data["password"]);
         $user->setFirstname($data["firstname"]);
         $user->setLastname($data["lastname"]);
         $user->setRegistrationAt(new DateTime());
+        $hashPassword = $this->hasher->hashPassword(
+            $user,
+            $data['password']
+        );
+        $user->setPassword($hashPassword);
         $this->userRepository->add($user, true);
 
         return $this->json($user, Response::HTTP_CREATED, [],  ['groups' => [
