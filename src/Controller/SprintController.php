@@ -26,7 +26,7 @@ class SprintController extends ControllerContext
 
 
     /* List all Sprint */
-    #[Route('/sprints', name: 'sprint_list', methods: ["HEAD", "GET"])]
+    #[Route('/sprint-list', name: 'sprint_list', methods: ["HEAD", "GET"])]
     public function sprintList(): JsonResponse
     {
         $sprint = $this->sprintRepository->findAll();
@@ -36,7 +36,7 @@ class SprintController extends ControllerContext
 
 
     /* List all Sprint on details */
-    #[Route('/sprints_details', name: 'sprint_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/sprint-list-details', name: 'sprint_list_details', methods: ["HEAD", "GET"])]
     public function sprintListDetails(): JsonResponse
     {
         $sprint =  $this->sprintRepository->findAll();
@@ -45,7 +45,7 @@ class SprintController extends ControllerContext
             'sprint',
             'sprint_project', 'project',
             'sprint_user', 'user',
-            'sprint_userStory', 'userStory'
+            'sprint_ticket', 'ticket'
         ]]);
     }
 
@@ -65,7 +65,7 @@ class SprintController extends ControllerContext
             'sprint',
             'sprint_project', 'project',
             'sprint_user', 'user',
-            'sprint_userStory', 'userStory'
+            'sprint_ticket', 'ticket'
         ]]);
     }
 
@@ -128,23 +128,13 @@ class SprintController extends ControllerContext
             $sprint->setEndDate(new \DateTime($data['end_date']));
         }
 
-        // TODO USER STORY ADD
-        if (!empty($data["user_story_id"])) {
-            $sprint->setEndDate(new \DateTime($data['end_date']));
-        }
-
-        // TODO USER ADD
-        if (!empty($data["user_id"])) {
-            $sprint->setEndDate(new \DateTime($data['end_date']));
-        }
-
         $this->sprintRepository->add($sprint, true);
 
         return $this->json($sprint, Response::HTTP_OK, [], ['groups' => [
             'sprint',
             'sprint_project', 'project',
             'sprint_user', 'user',
-            'sprint_userStory', 'userStory'
+            'sprint_ticket', 'ticket'
         ]]);
     }
 
@@ -162,6 +152,6 @@ class SprintController extends ControllerContext
 
         $this->sprintRepository->remove($sprint, true);
 
-        return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint']]);
+        return $this->json($this->successEntityDeleted("sprint"), Response::HTTP_OK);
     }
 }

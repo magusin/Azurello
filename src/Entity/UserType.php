@@ -22,17 +22,17 @@ class UserType
     private $label;
 
     #[Groups(['userType_project'])]
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_types')]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userTypes')]
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
 
     #[Groups(['userType_userProject'])]
-    #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: "user_type")]
-    private Collection $user_projects;
+    #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: "userType")]
+    private Collection $userProjects;
 
     public function __construct()
     {
-        $this->user_projects = new ArrayCollection();
+        $this->userProjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,25 +69,25 @@ class UserType
      */
     public function getUserProjects(): Collection
     {
-        return $this->user_projects;
+        return $this->userProjects;
     }
 
-    public function addUserProject(UserProject $user_project): self
+    public function addUserProject(UserProject $userProject): self
     {
-        if (!$this->user_projects->contains($user_project)) {
-            $this->user_projects->add($user_project);
-            $user_project->setUserType($this);
+        if (!$this->userProjects->contains($userProject)) {
+            $this->userProjects->add($userProject);
+            $userProject->setUserType($this);
         }
 
         return $this;
     }
 
-    public function removeUserProject(UserProject $user_project): self
+    public function removeUserProject(UserProject $userProject): self
     {
-        if ($this->user_projects->removeElement($user_project)) {
+        if ($this->userProjects->removeElement($userProject)) {
             // set the owning side to null (unless already changed)
-            if ($user_project->getUserType() === $this) {
-                $user_project->setUserType(null);
+            if ($userProject->getUserType() === $this) {
+                $userProject->setUserType(null);
             }
         }
 

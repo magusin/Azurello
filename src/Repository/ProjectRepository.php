@@ -43,7 +43,7 @@ class ProjectRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('project');
         return $qb->select('project')
-            ->where($qb->expr()->isNull("project.deleted_by"))
+            ->where($qb->expr()->isNull("project.deletedBy"))
             ->getQuery()->getResult();
     }
 

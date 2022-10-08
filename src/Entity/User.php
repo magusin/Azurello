@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Serializer\Annotation\Groups; 
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -41,29 +41,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user'])]
     #[ORM\Column(type: 'datetime')]
-    private $registration_at;
+    private $registrationAt;
 
     #[Groups(['user'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $last_connection_at;
+    private $lastConnectionAt;
 
     #[Groups(['user_sprint'])]
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private Collection $sprints;
 
-    #[Groups(['user_task'])]
-    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user')]
-    private Collection $tasks;
+    #[Groups(['user_ticketTask'])]
+    #[ORM\OneToMany(targetEntity: TicketTask::class, mappedBy: 'user')]
+    private Collection $ticketTasks;
 
     #[Groups(['user_userProject'])]
     #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: 'user')]
-    private Collection $user_projects;
+    private Collection $userProjects;
 
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
-        $this->user_projects = new ArrayCollection();
+        $this->ticketTasks = new ArrayCollection();
+        $this->userProjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -106,11 +106,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $user_roles = $this->roles;
+        $userRoles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $user_roles[] = 'ROLE_USER';
+        $userRoles[] = 'ROLE_USER';
 
-        return array_unique($user_roles);
+        return array_unique($userRoles);
     }
 
     public function setRoles(array $roles): self
@@ -181,24 +181,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRegistrationAt(): ?\DateTimeInterface
     {
-        return $this->registration_at;
+        return $this->registrationAt;
     }
 
-    public function setRegistrationAt(\DateTimeInterface $registration_at): self
+    public function setRegistrationAt(\DateTimeInterface $registrationAt): self
     {
-        $this->registration_at = $registration_at;
+        $this->registrationAt = $registrationAt;
 
         return $this;
     }
 
     public function getLastConnectionAt(): ?\DateTimeInterface
     {
-        return $this->last_connection_at;
+        return $this->lastConnectionAt;
     }
 
-    public function setLastConnectionAt(?\DateTimeInterface $last_connection_at): self
+    public function setLastConnectionAt(?\DateTimeInterface $lastConnectionAt): self
     {
-        $this->last_connection_at = $last_connection_at;
+        $this->lastConnectionAt = $lastConnectionAt;
 
         return $this;
     }
@@ -231,29 +231,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Task>
+     * @return Collection<int, TicketTask>
      */
-    public function getTasks(): Collection
+    public function getTicketTasks(): Collection
     {
-        return $this->tasks;
+        return $this->ticketTasks;
     }
 
-    public function addTask(Task $task): self
+    public function addTicketTask(TicketTask $ticketTask): self
     {
-        if (!$this->tasks->contains($task)) {
-            $this->tasks->add($task);
-            $task->setUser($this);
+        if (!$this->ticketTasks->contains($ticketTask)) {
+            $this->ticketTasks->add($ticketTask);
+            $ticketTask->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeTicketTask(TicketTask $ticketTask): self
     {
-        if ($this->tasks->removeElement($task)) {
+        if ($this->ticketTasks->removeElement($ticketTask)) {
             // set the owning side to null (unless already changed)
-            if ($task->getUser() === $this) {
-                $task->setUser(null);
+            if ($ticketTask->getUser() === $this) {
+                $ticketTask->setUser(null);
             }
         }
 
@@ -265,25 +265,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserProjects(): Collection
     {
-        return $this->user_projects;
+        return $this->userProjects;
     }
 
-    public function addUserProject(UserProject $user_project): self
+    public function addUserProject(UserProject $userProject): self
     {
-        if (!$this->user_projects->contains($user_project)) {
-            $this->user_projects->add($user_project);
-            $user_project->setUser($this);
+        if (!$this->userProjects->contains($userProject)) {
+            $this->userProjects->add($userProject);
+            $userProject->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeUserProject(UserProject $user_project): self
+    public function removeUserProject(UserProject $userProject): self
     {
-        if ($this->user_projects->removeElement($user_project)) {
+        if ($this->userProjects->removeElement($userProject)) {
             // set the owning side to null (unless already changed)
-            if ($user_project->getUser() === $this) {
-                $user_project->setUser(null);
+            if ($userProject->getUser() === $this) {
+                $userProject->setUser(null);
             }
         }
 

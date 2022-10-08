@@ -11,22 +11,22 @@ class UserProject
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['userProject'])] 
+    #[Groups(['userProject'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['userProject_project'])] 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'user_projects')]
+    #[Groups(['userProject_project'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
 
-    #[Groups(['userProject_details'])] 
-    #[ORM\ManyToOne(targetEntity: UserType::class, inversedBy: 'user_projects')]
+    #[Groups(['userProject_details'])]
+    #[ORM\ManyToOne(targetEntity: UserType::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
-    private UserType $user_type;
+    private UserType $userType;
 
-    #[Groups(['userProject_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user_projects')]
+    #[Groups(['userProject_user'])]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
@@ -61,12 +61,12 @@ class UserProject
 
     public function getUserType(): ?UserType
     {
-        return $this->user_type;
+        return $this->userType;
     }
 
-    public function setUserType(?UserType $user_type): self
+    public function setUserType(?UserType $userType): self
     {
-        $this->user_type = $user_type;
+        $this->userType = $userType;
 
         return $this;
     }

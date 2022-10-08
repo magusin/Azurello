@@ -13,21 +13,21 @@ class Status
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['status'])] 
+    #[Groups(['status'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['status'])] 
+    #[Groups(['status'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
 
-    #[Groups(['status_userStory'])] 
-    #[ORM\OneToMany(mappedBy: 'status', targetEntity: UserStory::class, orphanRemoval: true)]
-    private Collection $user_stories;
+    #[Groups(['status_ticket'])]
+    #[ORM\OneToMany(mappedBy: 'status', targetEntity: Ticket::class, orphanRemoval: true)]
+    private Collection $tickets;
 
-    #[Groups(['status_task'])]
-    #[ORM\OneToMany(mappedBy: 'status', targetEntity: Task::class, orphanRemoval: true)]
-    private Collection $tasks;
+    #[Groups(['status_ticketTask'])]
+    #[ORM\OneToMany(mappedBy: 'status', targetEntity: TicketTask::class, orphanRemoval: true)]
+    private Collection $ticketTasks;
 
     #[Groups(['status_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'status')]
@@ -36,8 +36,8 @@ class Status
 
     public function __construct()
     {
-        $this->user_stories = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
+        $this->ticketTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,29 +58,29 @@ class Status
     }
 
     /**
-     * @return Collection<int, UserStory>
+     * @return Collection<int, Ticket>
      */
-    public function getUserStories(): Collection
+    public function getTickets(): Collection
     {
-        return $this->user_stories;
+        return $this->tickets;
     }
 
-    public function addUserStory(UserStory $user_story): self
+    public function addTicket(Ticket $ticket): self
     {
-        if (!$this->user_stories->contains($user_story)) {
-            $this->user_stories->add($user_story);
-            $user_story->setStatus($this);
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setStatus($this);
         }
 
         return $this;
     }
 
-    public function removeUserStory(UserStory $user_story): self
+    public function removeTicket(Ticket $ticket): self
     {
-        if ($this->user_stories->removeElement($user_story)) {
+        if ($this->tickets->removeElement($ticket)) {
             // set the owning side to null (unless already changed)
-            if ($user_story->getStatus() === $this) {
-                $user_story->setStatus(null);
+            if ($ticket->getStatus() === $this) {
+                $ticket->setStatus(null);
             }
         }
 
@@ -88,29 +88,29 @@ class Status
     }
 
     /**
-     * @return Collection<int, Task>
+     * @return Collection<int, TicketTask>
      */
-    public function getTasks(): Collection
+    public function getTicketTasks(): Collection
     {
-        return $this->tasks;
+        return $this->ticketTasks;
     }
 
-    public function addTask(Task $task): self
+    public function addTicketTask(TicketTask $ticketTask): self
     {
-        if (!$this->tasks->contains($task)) {
-            $this->tasks->add($task);
-            $task->setStatus($this);
+        if (!$this->ticketTasks->contains($ticketTask)) {
+            $this->ticketTasks->add($ticketTask);
+            $ticketTask->setStatus($this);
         }
 
         return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeTicketTask(TicketTask $ticketTask): self
     {
-        if ($this->tasks->removeElement($task)) {
+        if ($this->ticketTasks->removeElement($ticketTask)) {
             // set the owning side to null (unless already changed)
-            if ($task->getStatus() === $this) {
-                $task->setStatus(null);
+            if ($ticketTask->getStatus() === $this) {
+                $ticketTask->setStatus(null);
             }
         }
 

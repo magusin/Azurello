@@ -23,35 +23,35 @@ class Project
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'datetime')]
-    private $created_at;
+    private $createdAt;
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'string', length: 45)]
-    private $created_by;
+    private $createdBy;
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $updated_at;
+    private $updatedAt;
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
-    private $updated_by;
+    private $updatedBy;
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deleted_at;
+    private $deletedAt;
 
     #[Groups(['project'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
-    private $deleted_by;
+    private $deletedBy;
 
     #[Groups(['project_userType'])]
     #[ORM\OneToMany(targetEntity: UserType::class, mappedBy: "project")]
-    private Collection $user_types;
+    private Collection $userTypes;
 
-    #[Groups(['project_userStoryGroup'])]
-    #[ORM\OneToMany(targetEntity: UserStoryGroup::class, mappedBy: "project")]
-    private Collection $user_story_groups;
+    #[Groups(['project_levelGroup'])]
+    #[ORM\OneToMany(targetEntity: LevelGroup::class, mappedBy: "project")]
+    private Collection $levelGroups;
 
     #[Groups(['project_status'])]
     #[ORM\OneToMany(targetEntity: Status::class, mappedBy: "project")]
@@ -63,15 +63,15 @@ class Project
 
     #[Groups(['project_userProject'])]
     #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: "project")]
-    private Collection $user_projects;
+    private Collection $userProjects;
 
     public function __construct()
     {
-        $this->user_types = new ArrayCollection();
-        $this->user_story_groups = new ArrayCollection();
+        $this->userTypes = new ArrayCollection();
+        $this->levelGroups = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->sprints = new ArrayCollection();
-        $this->user_projects = new ArrayCollection();
+        $this->userProjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,72 +93,72 @@ class Project
 
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getCreatedBy(): ?string
     {
-        return $this->created_by;
+        return $this->createdBy;
     }
 
-    public function setCreatedBy(string $created_by): self
+    public function setCreatedBy(string $createdBy): self
     {
-        $this->created_by = $created_by;
+        $this->createdBy = $createdBy;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updated_at): self
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function getUpdatedBy(): ?string
     {
-        return $this->updated_by;
+        return $this->updatedBy;
     }
 
-    public function setUpdatedBy(?string $updated_by): self
+    public function setUpdatedBy(?string $updatedBy): self
     {
-        $this->updated_by = $updated_by;
+        $this->updatedBy = $updatedBy;
 
         return $this;
     }
 
     public function getDeletedAt(): ?\DateTimeInterface
     {
-        return $this->deleted_at;
+        return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeInterface $deleted_at): self
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
     {
-        $this->deleted_at = $deleted_at;
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
 
     public function getDeletedBy(): ?string
     {
-        return $this->deleted_by;
+        return $this->deletedBy;
     }
 
-    public function setDeletedBy(?string $deleted_by): self
+    public function setDeletedBy(?string $deletedBy): self
     {
-        $this->deleted_by = $deleted_by;
+        $this->deletedBy = $deletedBy;
 
         return $this;
     }
@@ -168,25 +168,25 @@ class Project
      */
     public function getUserTypes(): Collection
     {
-        return $this->user_types;
+        return $this->userTypes;
     }
 
-    public function addUserType(UserType $user_type): self
+    public function addUserType(UserType $userType): self
     {
-        if (!$this->user_types->contains($user_type)) {
-            $this->user_types->add($user_type);
-            $user_type->setProject($this);
+        if (!$this->userTypes->contains($userType)) {
+            $this->userTypes->add($userType);
+            $userType->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeUserType(UserType $user_type): self
+    public function removeUserType(UserType $userType): self
     {
-        if ($this->user_types->removeElement($user_type)) {
+        if ($this->userTypes->removeElement($userType)) {
             // set the owning side to null (unless already changed)
-            if ($user_type->getProject() === $this) {
-                $user_type->setProject(null);
+            if ($userType->getProject() === $this) {
+                $userType->setProject(null);
             }
         }
 
@@ -196,27 +196,27 @@ class Project
     /**
      * @return Collection<int, Group>
      */
-    public function getUserStoryGroups(): Collection
+    public function getLevelGroups(): Collection
     {
-        return $this->user_story_groups;
+        return $this->levelGroups;
     }
 
-    public function addUserStoryGroup(UserStoryGroup $userStoryGroup): self
+    public function addLevelGroups(LevelGroup $levelGroup): self
     {
-        if (!$this->user_story_groups->contains($userStoryGroup)) {
-            $this->user_story_groups->add($userStoryGroup);
-            $userStoryGroup->setProject($this);
+        if (!$this->levelGroups->contains($levelGroup)) {
+            $this->levelGroups->add($levelGroup);
+            $levelGroup->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeUserStoryGroup(UserStoryGroup $userStoryGroup): self
+    public function removeLevelGroups(LevelGroup $levelGroup): self
     {
-        if ($this->user_story_groups->removeElement($userStoryGroup)) {
+        if ($this->levelGroups->removeElement($levelGroup)) {
             // set the owning side to null (unless already changed)
-            if ($userStoryGroup->getProject() === $this) {
-                $userStoryGroup->setProject(null);
+            if ($levelGroup->getProject() === $this) {
+                $levelGroup->setProject(null);
             }
         }
 
@@ -258,25 +258,25 @@ class Project
      */
     public function getUserProjects(): Collection
     {
-        return $this->user_projects;
+        return $this->userProjects;
     }
 
-    public function addUserProject(UserProject $user_project): self
+    public function addUserProject(UserProject $userProject): self
     {
-        if (!$this->user_projects->contains($user_project)) {
-            $this->user_projects->add($user_project);
-            $user_project->setProject($this);
+        if (!$this->userProjects->contains($userProject)) {
+            $this->userProjects->add($userProject);
+            $userProject->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeUserProject(UserProject $user_project): self
+    public function removeUserProject(UserProject $userProject): self
     {
-        if ($this->user_projects->removeElement($user_project)) {
+        if ($this->userProjects->removeElement($userProject)) {
             // set the owning side to null (unless already changed)
-            if ($user_project->getProject() === $this) {
-                $user_project->setProject(null);
+            if ($userProject->getProject() === $this) {
+                $userProject->setProject(null);
             }
         }
 

@@ -25,6 +25,11 @@ class ControllerContext extends AbstractController
     {
         return "A relation between $entityName1 & $entityName2 already exist";
     }
+    
+    protected function errorMessageRelationItself(string $entityName)
+    {
+        return "Cannont add a relation between $entityName and itself";
+    }
 
     protected function successEntityDeleted(string $entityName) {
         return "$entityName is successfully deleted";

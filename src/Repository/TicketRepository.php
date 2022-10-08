@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\UserStory;
+use App\Entity\Ticket;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UserStory>
+ * @extends ServiceEntityRepository<Ticket>
  *
- * @method UserStory|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserStory|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserStory[]    findAll()
- * @method UserStory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Ticket|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Ticket|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Ticket[]    findAll()
+ * @method Ticket[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserStoryRepository extends ServiceEntityRepository
+class TicketRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserStory::class);
+        parent::__construct($registry, Ticket::class);
     }
 
-    public function add(UserStory $entity, bool $flush = false): void
+    public function add(Ticket $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class UserStoryRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(UserStory $entity, bool $flush = false): void
+    public function remove(Ticket $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -41,14 +41,14 @@ class UserStoryRepository extends ServiceEntityRepository
 
     public function findAllNotDeleted(): array
     {
-        $qb = $this->createQueryBuilder('userStory');
-        return $qb->select('userStory')
-            ->where($qb->expr()->isNull("userStory.deleted_by"))
+        $qb = $this->createQueryBuilder('ticket');
+        return $qb->select('ticket')
+            ->where($qb->expr()->isNull("ticket.deletedBy"))
             ->getQuery()->getResult();
     }
 
 //    /**
-//     * @return UserStory[] Returns an array of UserStory objects
+//     * @return Ticket[] Returns an array of Ticket objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -62,7 +62,7 @@ class UserStoryRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?UserStory
+//    public function findOneBySomeField($value): ?Ticket
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')
