@@ -21,7 +21,7 @@ class ProjectController extends ControllerContext
     }
 
     /* List all Project */
-    #[Route('/projects', name: 'project_list', methods: ["HEAD", "GET"])]
+    #[Route('/project-list', name: 'project_list', methods: ["HEAD", "GET"])]
     public function projectList(): JsonResponse
     {
         $project = $this->projectRepository->findAllNotDeleted();
@@ -31,7 +31,7 @@ class ProjectController extends ControllerContext
 
 
     /* List all Project in details */
-    #[Route('/projects_details', name: 'project_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/project-list-details', name: 'project_list_details', methods: ["HEAD", "GET"])]
     public function projectListDetails(): JsonResponse
     {
         $project = $this->projectRepository->findAllNotDeleted();
@@ -42,13 +42,13 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_userStoryGroup', 'userStoryGroup'
+            'project_levelGroup', 'levelGroup'
         ]]);
     }
 
 
     /* Specific Project details */
-    #[Route('/project/{id}', name: 'project', methods: ["HEAD", "GET"])]
+    #[Route('/project/{id}', name: 'project_details', methods: ["HEAD", "GET"])]
     public function project(int $id): JsonResponse
     {
         $project = $this->projectRepository->find($id);
@@ -69,13 +69,13 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_userStoryGroup', 'userStoryGroup'
+            'project_levelGroup', 'levelGroup'
         ]]);
     }
 
 
     /* Create project */
-    #[Route('/project', name: 'create_project', methods: ["POST"])]
+    #[Route('/project', name: 'project_create', methods: ["POST"])]
     public function createProject(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -99,7 +99,7 @@ class ProjectController extends ControllerContext
 
 
     /* Edit Project */
-    #[Route('project/{id}', name: 'edit_project', methods: ["PATCH"])]
+    #[Route('project/{id}', name: 'project_edit', methods: ["PATCH"])]
     public function editProject(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -136,13 +136,13 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_userStoryGroup', 'userStoryGroup'
+            'project_levelGroup', 'levelGroup'
         ]]);
     }
 
 
     /* Soft Delete Project */
-    #[Route('/project/{id}', name: 'delete_project', methods: ["DELETE"])]
+    #[Route('/project/{id}', name: 'project_delete', methods: ["DELETE"])]
     public function deleteProject(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -169,13 +169,6 @@ class ProjectController extends ControllerContext
         $project->setDeletedBy($data["deleted_by"]);
         $this->projectRepository->add($project, true);
 
-        return $this->json($project, Response::HTTP_ACCEPTED, [], ['groups' => [
-            'project',
-            'project_userType', 'userType',
-            'project_userProject', 'userProject',
-            'project_sprint', 'sprint',
-            'project_status', 'status',
-            'project_userStoryGroup', 'userStoryGroup'
-        ]]);
+        return $this->json($this->successEntityDeleted("project"), Response::HTTP_OK);
     }
 }

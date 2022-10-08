@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\SprintRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups; 
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SprintRepository::class)]
@@ -23,21 +23,21 @@ class Sprint
 
     #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
-    private $start_date;
+    private $startDate;
 
     #[Groups(['sprint'])]
     #[ORM\Column(type: 'datetime')]
-    private $end_date;
+    private $endDate;
 
     #[Groups(['sprint_user'])]
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sprints')]
     private Collection $users;
 
-    #[Groups(['sprint_userStory'])] 
-    #[ORM\ManyToMany(targetEntity: UserStory::class, mappedBy: 'sprints')]
-    private Collection $user_stories;
+    #[Groups(['sprint_ticket'])]
+    #[ORM\ManyToMany(targetEntity: Ticket::class, mappedBy: 'sprints')]
+    private Collection $tickets;
 
-    #[Groups(['sprint_project'])] 
+    #[Groups(['sprint_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'sprints')]
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
@@ -55,24 +55,24 @@ class Sprint
 
     public function getStartDate(): ?\DateTimeInterface
     {
-        return $this->start_date;
+        return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $start_date): self
+    public function setStartDate(\DateTimeInterface $startDate): self
     {
-        $this->start_date = $start_date;
+        $this->startDate = $startDate;
 
         return $this;
     }
 
     public function getEndDate(): ?\DateTimeInterface
     {
-        return $this->end_date;
+        return $this->endDate;
     }
 
-    public function setEndDate(\DateTimeInterface $end_date): self
+    public function setEndDate(\DateTimeInterface $endDate): self
     {
-        $this->end_date = $end_date;
+        $this->endDate = $endDate;
 
         return $this;
     }
@@ -114,27 +114,27 @@ class Sprint
     }
 
     /**
-     * @return Collection<int, UserStory>
+     * @return Collection<int, Ticket>
      */
-    public function getUserStories(): Collection
+    public function getTickets(): Collection
     {
-        return $this->user_stories;
+        return $this->tickets;
     }
 
-    public function addUserStory(Userstory $user_story): self
+    public function addTicket(Ticket $ticket): self
     {
-        if (!$this->user_stories->contains($user_story)) {
-            $this->user_stories->add($user_story);
-            $user_story->addSprint($this);
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->addSprint($this);
         }
 
         return $this;
     }
 
-    public function removeUserstory(Userstory $user_story): self
+    public function removeTicket(Ticket $ticket): self
     {
-        if ($this->user_stories->removeElement($user_story)) {
-            $user_story->removeSprint($this);
+        if ($this->tickets->removeElement($ticket)) {
+            $ticket->removeSprint($this);
         }
 
         return $this;

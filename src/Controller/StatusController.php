@@ -25,7 +25,7 @@ class StatusController extends ControllerContext
     }
 
     /* List all Status */
-    #[Route('/status', name: 'status_list', methods: ["HEAD", "GET"])]
+    #[Route('/status-list', name: 'status_list', methods: ["HEAD", "GET"])]
     public function listStatus(): JsonResponse
     {
         $status = $this->statusRepository->findAll();
@@ -35,7 +35,7 @@ class StatusController extends ControllerContext
 
 
     /* List all Status in details*/
-    #[Route('/status_details', name: 'status_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/status-list-details', name: 'status_list_details', methods: ["HEAD", "GET"])]
     public function listStatusDetails(): JsonResponse
     {
         $status = $this->statusRepository->findAll();
@@ -59,15 +59,15 @@ class StatusController extends ControllerContext
         }
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
-            'status_task', 'task',
-            'status_userStory', 'userStory',
+            'status_ticketTask', 'ticketTask',
+            'status_ticket', 'ticket',
             'status_project', 'project'
         ]]);
     }
 
 
     /* Create status */
-    #[Route('/status', name: 'create_status', methods: ["POST"])]
+    #[Route('/status', name: 'status_create', methods: ["POST"])]
     public function createStatus(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -101,7 +101,7 @@ class StatusController extends ControllerContext
     }
 
     /* Edit Status */
-    #[Route('status/{id}', name: 'edit_status', methods: ["PATCH"])]
+    #[Route('status/{id}', name: 'status_edit', methods: ["PATCH"])]
     public function editStatus(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -116,6 +116,19 @@ class StatusController extends ControllerContext
             $status->setLabel($data["label"]);
         }
 
+        if (!empty($data["project_id"])) {
+            $project = $this->projectRepository->find($data["project_id"]);
+            // Check if project exists
+            if (!$project) {
+                return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+            }
+            // Check if project is not deleted
+            if ($project->getDeletedBy(!null)) {
+                return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+            }
+            $status->setProject($project);
+        }
+
         $this->statusRepository->add($status, true);
 
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
@@ -125,7 +138,7 @@ class StatusController extends ControllerContext
     }
 
     /* Hard Delete Status */
-    #[Route('/status/{id}', name: 'delete_status', methods: ["DELETE"])]
+    #[Route('/status/{id}', name: 'status_delete', methods: ["DELETE"])]
     public function deleteStatus(int $id): JsonResponse
     {
         $status = $this->statusRepository->find($id);
@@ -137,11 +150,6 @@ class StatusController extends ControllerContext
 
         $this->statusRepository->remove($status, true);
 
-        return $this->json($status, Response::HTTP_OK, [], ['groups' => [
-            'status',
-            'status_userStory', 'userStory',
-            'status_task', 'task',
-            'status_project', 'project'
-        ]]);
+        return $this->json($this->successEntityDeleted("status"), Response::HTTP_OK);
     }
 }

@@ -2,35 +2,35 @@
 
 namespace App\Entity;
 
-use App\Repository\TaskRepository;
+use App\Repository\TicketTaskRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups; 
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: TaskRepository::class)]
-class Task
+#[ORM\Entity(repositoryClass: TicketTaskRepository::class)]
+class TicketTask
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(['task'])] 
+    #[Groups(['ticketTask'])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(['task'])]
+    #[Groups(['ticketTask'])]
     #[ORM\Column(length: 45)]
     private $name;
 
-    #[Groups(['task_userStory'])] 
-    #[ORM\ManyToOne(targetEntity: UserStory::class, inversedBy: 'tasks')]
+    #[Groups(['ticketTask_ticket'])]
+    #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'ticketTasks')]
     #[ORM\JoinColumn(nullable: false)]
-    private UserStory $user_story;
+    private Ticket $ticket;
 
-    #[Groups(['task_status'])] 
-    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'tasks')]
+    #[Groups(['ticketTask_status'])]
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'ticketTasks')]
     #[ORM\JoinColumn(nullable: false)]
     private Status $status;
 
-    #[Groups(['task_user'])] 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks')]
+    #[Groups(['ticketTask_user'])]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'ticketTasks')]
     private User $user;
 
     public function getId(): ?int
@@ -38,14 +38,14 @@ class Task
         return $this->id;
     }
 
-    public function getUserStory(): ?UserStory
+    public function getTicket(): ?Ticket
     {
-        return $this->user_story;
+        return $this->ticket;
     }
 
-    public function setUserStory(?UserStory $user_story): self
+    public function setTicket(?Ticket $ticket): self
     {
-        $this->user_story = $user_story;
+        $this->ticket = $ticket;
 
         return $this;
     }

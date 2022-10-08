@@ -6,7 +6,7 @@ use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Repository\TaskRepository;
+use App\Repository\TicketTaskRepository;
 use App\Repository\SprintRepository;
 use App\Repository\UserProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,19 +20,19 @@ class UserController extends ControllerContext
 
     public function __construct(
         UserRepository $userRepository,
-        TaskRepository $taskRepository,
+        TicketTaskRepository $ticketTaskRepository,
         SprintRepository $sprintRepository,
         UserProjectRepository $userProjectRepository
     ) {
         $this->userRepository = $userRepository;
-        $this->taskRepository = $taskRepository;
+        $this->ticketTaskRepository = $ticketTaskRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
     }
 
     
     /* List all User */
-    #[Route('/users', name: 'user_list', methods: ["HEAD", "GET"])]
+    #[Route('/user-list', name: 'user_list', methods: ["HEAD", "GET"])]
     public function userList(): JsonResponse
     {
         $user = $this->userRepository->findAll();
@@ -42,7 +42,7 @@ class UserController extends ControllerContext
 
 
     /* List all Users on details */
-    #[Route('/users_details', name: 'user_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/user-list-details', name: 'user_list_details', methods: ["HEAD", "GET"])]
     public function userListDetails(): JsonResponse
     {
         $user = $this->userRepository->findAll();
@@ -50,13 +50,13 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_task', 'task',
+            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
 
     /* Specific User details */
-    #[Route('/user/{id}', name: 'user', methods: ["HEAD", "GET"])]
+    #[Route('/user/{id}', name: 'user-details', methods: ["HEAD", "GET"])]
     public function user(int $id): JsonResponse
     {
         $user = $this->userRepository->find($id);
@@ -68,14 +68,14 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_task', 'task',
+            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
 
 
     /* Create user */
-    #[Route('/user', name: 'create_user', methods: ["POST"])]
+    #[Route('/user', name: 'user_create', methods: ["POST"])]
     public function createUser(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -101,17 +101,17 @@ class UserController extends ControllerContext
         $user->setRegistrationAt(new DateTime());
         $this->userRepository->add($user, true);
 
-        return $this->json($user, Response::HTTP_CREATED, [],  ['groups' => [
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => [
             'user',
             'user_sprint', 'sprint',
-            'user_task', 'task',
+            'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
 
 
     /* Edit User */
-    #[Route('user/{id}', name: 'edit_user', methods: ["PATCH"])]
+    #[Route('user/{id}', name: 'user_edit', methods: ["PATCH"])]
     public function editUser(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -138,13 +138,13 @@ class UserController extends ControllerContext
             $user->setFirstname($data["firstname"]);
         }
 
-        if (!empty($data["task_id"])) {
-            $task = $this->taskRepository->find($data["task_id"]);
-            // Check if task exists
-            if (!$task) {
-                return $this->json($this->errorMessageEntityNotFound("task"), Response::HTTP_BAD_REQUEST);
+        if (!empty($data["ticketTask_id"])) {
+            $ticketTask = $this->ticketTaskRepository->find($data["ticketTask_id"]);
+            // Check if ticketTask exists
+            if (!$ticketTask) {
+                return $this->json($this->errorMessageEntityNotFound("ticketTask"), Response::HTTP_BAD_REQUEST);
             }
-            $user->addTask($task);
+            $user->addTicketTask($ticketTask);
         }
 
         if (!empty($data["sprint_id"])) {
@@ -170,14 +170,14 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_task', 'task',
+            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
 
 
     /* Hard Delete User */
-    #[Route('/user/{id}', name: 'delete_user', methods: ["DELETE"])]
+    #[Route('/user/{id}', name: 'user_delete', methods: ["DELETE"])]
     public function deleteUser(int $id): JsonResponse
     {
         $user = $this->userRepository->find($id);
@@ -189,11 +189,6 @@ class UserController extends ControllerContext
 
         $this->userRepository->remove($user, true);
 
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => [
-            'user',
-            // 'user_sprint', 'sprint',
-            // 'user_task', 'task',
-            'user_userProject', 'userProject'
-        ]]);
+        return $this->json($this->successEntityDeleted("user"), Response::HTTP_OK);
     }
 }

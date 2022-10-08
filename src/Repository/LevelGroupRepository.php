@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\UserStoryGroup;
+use App\Entity\LevelGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UserStoryGroup>
+ * @extends ServiceEntityRepository<LevelGroup>
  *
- * @method UserStoryGroup|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserStoryGroup|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserStoryGroup[]    findAll()
- * @method UserStoryGroup[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method LevelGroup|null find($id, $lockMode = null, $lockVersion = null)
+ * @method LevelGroup|null findOneBy(array $criteria, array $orderBy = null)
+ * @method LevelGroup[]    findAll()
+ * @method LevelGroup[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserStoryGroupRepository extends ServiceEntityRepository
+class LevelGroupRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserStoryGroup::class);
+        parent::__construct($registry, LevelGroup::class);
     }
 
-    public function add(UserStoryGroup $entity, bool $flush = false): void
+    public function add(LevelGroup $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class UserStoryGroupRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(UserStoryGroup $entity, bool $flush = false): void
+    public function remove(LevelGroup $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class UserStoryGroupRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return UserStoryGroup[] Returns an array of UserStoryGroup objects
+//     * @return LevelGroup[] Returns an array of LevelGroup objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class UserStoryGroupRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?UserStoryGroup
+//    public function findOneBySomeField($value): ?LevelGroup
 //    {
 //        return $this->createQueryBuilder('u')
 //            ->andWhere('u.exampleField = :val')

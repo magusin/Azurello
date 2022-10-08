@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Task;
+use App\Entity\TicketTask;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Task>
+ * @extends ServiceEntityRepository<TicketTask>
  *
- * @method Task|null find($id, $lockMode = null, $lockVersion = null)
- * @method Task|null findOneBy(array $criteria, array $orderBy = null)
- * @method Task[]    findAll()
- * @method Task[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method TicketTask|null find($id, $lockMode = null, $lockVersion = null)
+ * @method TicketTask|null findOneBy(array $criteria, array $orderBy = null)
+ * @method TicketTask[]    findAll()
+ * @method TicketTask[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TaskRepository extends ServiceEntityRepository
+class TicketTaskRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Task::class);
+        parent::__construct($registry, TicketTask::class);
     }
 
-    public function add(Task $entity, bool $flush = false): void
+    public function add(TicketTask $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TaskRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Task $entity, bool $flush = false): void
+    public function remove(TicketTask $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -41,7 +41,7 @@ class TaskRepository extends ServiceEntityRepository
 
 
 //    /**
-//     * @return Task[] Returns an array of Task objects
+//     * @return TicketTask[] Returns an array of TicketTask objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -55,7 +55,7 @@ class TaskRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Task
+//    public function findOneBySomeField($value): ?TicketTask
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')

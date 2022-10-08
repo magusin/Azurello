@@ -27,7 +27,7 @@ class UserTypeController extends ControllerContext
 
 
     /* List all UserType */
-    #[Route('/userType', name: 'userType_list', methods: ["HEAD", "GET"])]
+    #[Route('/user-type-list', name: 'userType_list', methods: ["HEAD", "GET"])]
     public function userTypeList(): JsonResponse
     {
         $userType = $this->userTypeRepository->findAll();
@@ -37,7 +37,7 @@ class UserTypeController extends ControllerContext
 
 
     /* List all UserType on details */
-    #[Route('/userType_details', name: 'userType_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/user-type-list-details', name: 'userType_list_details', methods: ["HEAD", "GET"])]
     public function userTypeListDetails(): JsonResponse
     {
         $userType = $this->userTypeRepository->findAll();
@@ -52,7 +52,7 @@ class UserTypeController extends ControllerContext
 
 
     /* Specific UserType details */
-    #[Route('/userType/{id}', name: 'userType', methods: ["HEAD", "GET"])]
+    #[Route('/user-type/{id}', name: 'userType_details', methods: ["HEAD", "GET"])]
     public function UserType(int $id): JsonResponse
     {
         $userType = $this->userTypeRepository->find($id);
@@ -72,7 +72,7 @@ class UserTypeController extends ControllerContext
 
 
     /* Create UserType */
-    #[Route('/userType', name: 'create_userType', methods: ["POST"])]
+    #[Route('/user-type', name: 'userType_create', methods: ["POST"])]
     public function createUserType(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -102,7 +102,7 @@ class UserTypeController extends ControllerContext
     }
 
     /* Edit userType */
-    #[Route('userType/{id}', name: 'userType_edit', methods: ["PATCH"])]
+    #[Route('user-type/{id}', name: 'userType_edit', methods: ["PATCH"])]
     public function editUserType(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -125,7 +125,7 @@ class UserTypeController extends ControllerContext
     }
 
     /* Hard Delete userType */
-    #[Route('/userType/{id}', name: 'userType_delete', methods: ["DELETE"])]
+    #[Route('/user-type/{id}', name: 'userType_delete', methods: ["DELETE"])]
     public function deleteUserType(int $id): JsonResponse
     {
         $userType = $this->userTypeRepository->find($id);
