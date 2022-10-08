@@ -96,13 +96,6 @@ class TicketTypeController extends ControllerContext
         $data = json_decode($request->getContent(), true);
         $ticketType = $this->ticketTypeRepository->find($id);
 
-        // Check JSON body
-        if (
-            empty($data["updated_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
-
         // Check if ticketType exists
         if (!$ticketType) {
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
@@ -123,24 +116,16 @@ class TicketTypeController extends ControllerContext
 
     /* Soft Delete ticketType */
     #[Route('/ticket-type/{id}', name: 'ticketType_delete', methods: ["DELETE"])]
-    public function deleteTicketType(Request $request, int $id): JsonResponse
+    public function deleteTicketType(int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
         $ticketType = $this->ticketTypeRepository->find($id);
-
-        // Check JSON body
-        if (
-            empty($data["deleted_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
 
         // Check if ticketType exists
         if (!$ticketType) {
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
         }
 
-        $this->ticketTypeRepository->add($ticketType, true);
+        $this->ticketTypeRepository->remove($ticketType, true);
 
         return $this->json($this->successEntityDeleted("ticketType"), Response::HTTP_OK);
     }

@@ -53,7 +53,8 @@ class TicketController extends ControllerContext
             'ticket',
             'ticket_levelGroup', 'levelGroup',
             'ticket_status', 'status',
-            'ticket_sprint', 'sprint'
+            'ticket_sprint', 'sprint',
+            'ticket_user', 'user'
         ]]);
     }
 

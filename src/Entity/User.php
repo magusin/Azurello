@@ -59,11 +59,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: 'user')]
     private Collection $userProjects;
 
+    #[Groups(['user_ticket'])]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Ticket::class)]
+    private Collection $tickets;
+
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
         $this->ticketTasks = new ArrayCollection();
         $this->userProjects = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -284,6 +289,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($userProject->getUser() === $this) {
                 $userProject->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Ticket $ticket): self
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Ticket $ticket): self
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getUser() === $this) {
+                $ticket->setUser(null);
             }
         }
 
