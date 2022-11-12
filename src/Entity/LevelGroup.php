@@ -43,7 +43,7 @@ class LevelGroup
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
-        $this->groupChildrens = new ArrayCollection();
+        $this->childrens = new ArrayCollection();
     }
 
     public function getId(): ?int

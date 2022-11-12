@@ -30,7 +30,7 @@ class TicketTaskController extends ControllerContext
 
 
     /* List all TicketTask */
-    #[Route('/ticketTask-list', name: 'ticketTask_list', methods: ["HEAD", "GET"])]
+    #[Route('/ticket-task-list', name: 'ticketTask_list', methods: ["HEAD", "GET"])]
     public function ticketTaskList(): JsonResponse
     {
         $ticketTask = $this->ticketTaskRepository->findAll();
@@ -39,7 +39,7 @@ class TicketTaskController extends ControllerContext
     }
 
     /* List all TicketTasks on details */
-    #[Route('/ticketTask-list-details', name: 'ticketTask_list_details', methods: ["HEAD", "GET"])]
+    #[Route('/ticket-task-list-details', name: 'ticketTask_list_details', methods: ["HEAD", "GET"])]
     public function ticketTaskListDetails(): JsonResponse
     {
         $ticketTask = $this->ticketTaskRepository->findAll();
@@ -54,7 +54,7 @@ class TicketTaskController extends ControllerContext
 
 
     /* Specific ticketTask details */
-    #[Route('/ticketTask/{id}', name: 'ticketTask_details', methods: ["HEAD", "GET"])]
+    #[Route('/ticket-task/{id}', name: 'ticketTask_details', methods: ["HEAD", "GET"])]
     public function ticketTask(int $id): JsonResponse
     {
         $ticketTask = $this->ticketTaskRepository->find($id);
@@ -73,7 +73,7 @@ class TicketTaskController extends ControllerContext
 
 
     /* Create ticketTask */
-    #[Route('/ticketTask', name: 'ticketTask_create', methods: ["POST"])]
+    #[Route('/ticket-task', name: 'ticketTask_create', methods: ["POST"])]
     public function createTicketTask(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -126,7 +126,7 @@ class TicketTaskController extends ControllerContext
 
 
     /* Edit TicketTask */
-    #[Route('ticketTask/{id}', name: 'ticketTask_edit', methods: ["PATCH"])]
+    #[Route('ticket-task/{id}', name: 'ticketTask_edit', methods: ["PATCH"])]
     public function editTicketTask(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -180,7 +180,7 @@ class TicketTaskController extends ControllerContext
 
 
     /* Hard Delete TicketTask */
-    #[Route('/ticketTask/{id}', name: 'ticketTask_delete', methods: ["DELETE"])]
+    #[Route('/ticket-task/{id}', name: 'ticketTask_delete', methods: ["DELETE"])]
     public function deleteTicketTask(int $id): JsonResponse
     {
         $ticketTask = $this->ticketTaskRepository->find($id);

@@ -65,6 +65,10 @@ class Project
     #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: "project")]
     private Collection $userProjects;
 
+    #[Groups(['project_ticketType'])]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: TicketType::class)]
+    private Collection $ticketTypes;
+
     public function __construct()
     {
         $this->userTypes = new ArrayCollection();
@@ -72,6 +76,7 @@ class Project
         $this->status = new ArrayCollection();
         $this->sprints = new ArrayCollection();
         $this->userProjects = new ArrayCollection();
+        $this->ticketTypes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -307,6 +312,36 @@ class Project
             // set the owning side to null (unless already changed)
             if ($sprint->getProject() === $this) {
                 $sprint->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TicketType>
+     */
+    public function getTicketTypes(): Collection
+    {
+        return $this->ticketTypes;
+    }
+
+    public function addTicketType(TicketType $ticketType): self
+    {
+        if (!$this->ticketTypes->contains($ticketType)) {
+            $this->ticketTypes->add($ticketType);
+            $ticketType->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicketType(TicketType $ticketType): self
+    {
+        if ($this->ticketTypes->removeElement($ticketType)) {
+            // set the owning side to null (unless already changed)
+            if ($ticketType->getProject() === $this) {
+                $ticketType->setProject(null);
             }
         }
 

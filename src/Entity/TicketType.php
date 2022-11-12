@@ -25,6 +25,11 @@ class TicketType
     #[ORM\OneToMany(mappedBy: 'ticketType', targetEntity: Ticket::class)]
     private Collection $tickets;
 
+    #[Groups(['ticketType_project'])]
+    #[ORM\ManyToOne(inversedBy: 'ticketTypes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Project $project;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -73,6 +78,18 @@ class TicketType
                 $ticket->setTicketType(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProject(): ?project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?project $project): self
+    {
+        $this->project = $project;
 
         return $this;
     }

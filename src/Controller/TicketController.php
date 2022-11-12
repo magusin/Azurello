@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\Ticket;
 use App\Repository\LevelGroupRepository;
-use App\Repository\ProjectRepository;
 use App\Repository\StatusRepository;
-use DateTime;
 use App\Repository\TicketRepository;
+use App\Repository\TicketTypeRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,19 +17,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class TicketController extends ControllerContext
 {
     private $ticketRepository;
-    private $projectRepository;
     private $statusRepository;
+    private $levelGroupRepository;
 
     public function __construct(
         TicketRepository $ticketRepository,
-        ProjectRepository $projectRepository,
         StatusRepository $statusRepository,
-        LevelGroupRepository $levelGroupRepository
+        LevelGroupRepository $levelGroupRepository,
+        TicketTypeRepository $ticketTypeRepository
     ) {
         $this->ticketRepository = $ticketRepository;
-        $this->projectRepository = $projectRepository;
         $this->statusRepository = $statusRepository;
         $this->levelGroupRepository = $levelGroupRepository;
+        $this->ticketTypeRepository = $ticketTypeRepository;
     }
 
 
@@ -54,7 +54,9 @@ class TicketController extends ControllerContext
             'ticket_levelGroup', 'levelGroup',
             'ticket_status', 'status',
             'ticket_sprint', 'sprint',
-            'ticket_user', 'user'
+            'ticket_type', 'type',
+            'ticket_user', 'user',
+            'ticket_task', 'task'
         ]]);
     }
 
@@ -79,7 +81,10 @@ class TicketController extends ControllerContext
             'ticket',
             'ticket_levelGroup', 'levelGroup',
             'ticket_status', 'status',
-            'ticket_sprint', 'sprint'
+            'ticket_sprint', 'sprint',
+            'ticket_type', 'type',
+            'ticket_user', 'user',
+            'ticket_task', 'task'
         ]]);
     }
 
@@ -92,10 +97,11 @@ class TicketController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["status_id"]) ||
             empty($data["name"]) ||
             empty($data["created_by"]) ||
-            empty($data["level_group_id"])
+            empty($data["status_id"]) ||
+            empty($data["level_group_id"]) ||
+            empty($data["ticket_type_id"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
@@ -112,18 +118,29 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("levelGroup"), Response::HTTP_BAD_REQUEST);
         }
 
+        $ticketType = $this->ticketTypeRepository->find($data["ticket_type_id"]);
+        // Check if ticket type exists
+        if (!$ticketType) {
+            return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
+        }
+
         $ticket = new Ticket();
         $ticket->setName($data["name"]);
         $ticket->setStatus($status);
+        $ticket->setTicketType($ticketType);
+        $ticket->setLevelGroup($levelGroup);
         $ticket->setCreatedAt(new DateTime());
         $ticket->setCreatedBy($data["created_by"]);
         $this->ticketRepository->add($ticket, true);
 
         return $this->json($ticket, Response::HTTP_CREATED, [], ['groups' => [
             'ticket',
-            'ticket_status', 'status',
             'ticket_levelGroup', 'levelGroup',
-            'ticket_project', 'project'
+            'ticket_status', 'status',
+            'ticket_sprint', 'sprint',
+            'ticket_type', 'type',
+            'ticket_user', 'user',
+            'ticket_task', 'task'
         ]]);
     }
 
@@ -171,7 +188,7 @@ class TicketController extends ControllerContext
             if (!$levelGroup) {
                 return $this->json($this->errorMessageEntityNotFound("levelGroup"), Response::HTTP_BAD_REQUEST);
             }
-            $ticket->setStatus($levelGroup);
+            $ticket->setLevelGroup($levelGroup);
         }
 
         $ticket->setUpdatedAt(new DateTime());
@@ -180,9 +197,12 @@ class TicketController extends ControllerContext
 
         return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
             'ticket',
-            'ticket_status', 'status',
             'ticket_levelGroup', 'levelGroup',
-            'ticket_project', 'project'
+            'ticket_status', 'status',
+            'ticket_sprint', 'sprint',
+            'ticket_type', 'type',
+            'ticket_user', 'user',
+            'ticket_task', 'task'
         ]]);
     }
 

@@ -25,6 +25,11 @@ class ControllerContext extends AbstractController
     {
         return "A relation between $entityName1 & $entityName2 already exist";
     }
+
+    protected function errorMessageRelationNotExist(string $entityName1, string $entityName2)
+    {
+        return "There is no relation between $entityName1 & $entityName2";
+    }
     
     protected function errorMessageRelationItself(string $entityName)
     {

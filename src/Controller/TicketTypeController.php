@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Context\ControllerContext;
 use App\Entity\TicketType;
+use App\Repository\ProjectRepository;
 use App\Repository\TicketRepository;
 use App\Repository\TicketTypeRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +18,12 @@ class TicketTypeController extends ControllerContext
 
     public function __construct(
         TicketRepository $ticketRepository,
-        TicketTypeRepository $ticketTypeRepository
+        TicketTypeRepository $ticketTypeRepository,
+        ProjectRepository $projectRepository
     ) {
         $this->ticketRepository = $ticketRepository;
         $this->ticketTypeRepository = $ticketTypeRepository;
+        $this->projectRepository = $projectRepository;
     }
 
 
@@ -42,7 +45,8 @@ class TicketTypeController extends ControllerContext
 
         return $this->json($ticketType, Response::HTTP_OK, [], ['groups' => [
             'ticketType',
-            'ticketType_ticket', 'ticket'
+            'ticketType_ticket', 'ticket',
+            'ticketType_project', 'project'
         ]]);
     }
 
@@ -60,7 +64,8 @@ class TicketTypeController extends ControllerContext
 
         return $this->json($ticketType, Response::HTTP_OK, [], ['groups' => [
             'ticketType',
-            'ticketType_ticket', 'ticket'
+            'ticketType_ticket', 'ticket',
+            'ticketType_project', 'project'
         ]]);
     }
 
@@ -73,18 +78,33 @@ class TicketTypeController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["name"])
+            empty($data["name"]) ||
+            empty($data["project_id"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if project is not deleted
+        if ($project->getDeletedBy(!null)) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
         $ticketType = new TicketType();
+        $ticketType->setProject($project);
         $ticketType->setName($data["name"]);
         $this->ticketTypeRepository->add($ticketType, true);
 
         return $this->json($ticketType, Response::HTTP_CREATED, [], ['groups' => [
             'ticketType',
-            'ticketType_ticket', 'ticket'
+            'ticketType_ticket', 'ticket',
+            'ticketType_project', 'project'
         ]]);
     }
 
@@ -109,12 +129,13 @@ class TicketTypeController extends ControllerContext
 
         return $this->json($ticketType, Response::HTTP_OK, [], ['groups' => [
             'ticketType',
-            'ticketType_ticket', 'ticket'
+            'ticketType_ticket', 'ticket',
+            'ticketType_project', 'project'
         ]]);
     }
 
 
-    /* Soft Delete ticketType */
+    /* Hard Delete ticketType */
     #[Route('/ticket-type/{id}', name: 'ticketType_delete', methods: ["DELETE"])]
     public function deleteTicketType(int $id): JsonResponse
     {
