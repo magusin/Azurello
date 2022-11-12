@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class SprintTicketController extends ControllerContext
+class TicketSprintController extends ControllerContext
 {
     private $sprintRepository;
     private $ticketRepository;
@@ -25,7 +25,7 @@ class SprintTicketController extends ControllerContext
 
     /* Create sprint_sprint */
     #[Route('/sprint-ticket', name: 'sprint_sprint_create', methods: ["POST"])]
-    public function createSprintTicket(Request $request): JsonResponse
+    public function createTicketSprint(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
