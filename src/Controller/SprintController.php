@@ -128,6 +128,15 @@ class SprintController extends ControllerContext
             $sprint->setEndDate(new \DateTime($data['end_date']));
         }
 
+        if (!empty($data["project_id"])) {
+            $project = $this->projectRepository->find($data["project_id"]);
+            // Check if project exists
+            if (!$project) {
+                return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+            }
+            $sprint->setProject($project);
+        }
+
         $this->sprintRepository->add($sprint, true);
 
         return $this->json($sprint, Response::HTTP_OK, [], ['groups' => [

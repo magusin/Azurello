@@ -67,6 +67,10 @@ class Ticket
     #[ORM\JoinColumn(nullable: false)]
     private TicketType $ticketType;
 
+    #[Groups(['ticket_user'])]
+    #[ORM\ManyToOne(inversedBy: 'tickets')]
+    private User $user;
+
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
@@ -248,6 +252,18 @@ class Ticket
     public function setTicketType(?TicketType $ticketType): self
     {
         $this->ticketType = $ticketType;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

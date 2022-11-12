@@ -42,7 +42,8 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup'
+            'project_levelGroup', 'levelGroup',
+            'project_ticketType', 'ticketType'
         ]]);
     }
 
@@ -69,7 +70,8 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup'
+            'project_levelGroup', 'levelGroup',
+            'project_ticketType', 'ticketType'
         ]]);
     }
 
@@ -136,7 +138,8 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup'
+            'project_levelGroup', 'levelGroup',
+            'project_ticketType', 'ticketType'
         ]]);
     }
 
