@@ -92,6 +92,9 @@ class ProjectController extends ControllerContext
 
         $project = new Project();
         $project->setName($data["name"]);
+        if (!empty($data["description"])) {
+            $project->setDescription($data["description"]);
+        }
         $project->setCreatedAt(new DateTime());
         $project->setCreatedBy($data["created_by"]);
         $this->projectRepository->add($project, true);
@@ -126,6 +129,9 @@ class ProjectController extends ControllerContext
 
         if (!empty($data["name"])) {
             $project->setName($data["name"]);
+        }
+        if (!empty($data["description"])) {
+            $project->setDescription($data["description"]);
         }
         $project->setUpdatedBy($data["updated_by"]);
         $project->setUpdatedAt(new DateTime());

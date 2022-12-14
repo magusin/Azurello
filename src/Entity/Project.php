@@ -22,6 +22,10 @@ class Project
     private $name;
 
     #[Groups(['project'])]
+    #[ORM\Column(type: 'string', length: 510,  nullable: true)]
+    private $description;
+
+    #[Groups(['project'])]
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
@@ -92,6 +96,18 @@ class Project
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }
