@@ -114,7 +114,7 @@ class LevelGroup
 
     public function removeChildren(LevelGroup $levelGroup): self
     {
-        if ($this->groupChildrens->removeElement($levelGroup)) {
+        if ($this->childrens->removeElement($levelGroup)) {
             // set the owning side to null (unless already changed)
             if ($levelGroup->getParent() === $this) {
                 $levelGroup->setParent(null);

@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TicketTypeController extends ControllerContext
 {
+    private $ticketRepository;
     private $ticketTypeRepository;
+    private $projectRepository;
 
     public function __construct(
         TicketRepository $ticketRepository,

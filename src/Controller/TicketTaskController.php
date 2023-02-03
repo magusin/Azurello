@@ -7,6 +7,7 @@ use App\Entity\TicketTask;
 use App\Repository\StatusRepository;
 use App\Repository\TicketTaskRepository;
 use App\Repository\TicketRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,12 +18,15 @@ class TicketTaskController extends ControllerContext
     private $ticketTaskRepository;
     private $ticketRepository;
     private $statusRepository;
+    private $userRepository;
 
     public function __construct(
+        UserRepository $userRepository,
         TicketTaskRepository $ticketTaskRepository,
         TicketRepository $ticketRepository,
         StatusRepository $statusRepository
     ) {
+        $this->userRepository = $userRepository;
         $this->ticketTaskRepository = $ticketTaskRepository;
         $this->ticketRepository = $ticketRepository;
         $this->statusRepository = $statusRepository;

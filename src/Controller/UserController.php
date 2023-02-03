@@ -13,21 +13,37 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 
 class UserController extends ControllerContext
 {
     private $userRepository;
+    private $ticketTaskRepository;
+    private $sprintRepository;
+    private $userProjectRepository;
+    private $hasher;
+    private $jwtManager;
+    private $tokenStorageInterface;
 
     public function __construct(
         UserRepository $userRepository,
         TicketTaskRepository $ticketTaskRepository,
         SprintRepository $sprintRepository,
-        UserProjectRepository $userProjectRepository
+        UserProjectRepository $userProjectRepository,
+        UserPasswordHasherInterface $hasher,
+        TokenStorageInterface $tokenStorageInterface,
+        JWTTokenManagerInterface $jwtManager
     ) {
         $this->userRepository = $userRepository;
         $this->ticketTaskRepository = $ticketTaskRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
+        $this->hasher = $hasher;
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
     }
 
     
@@ -73,10 +89,19 @@ class UserController extends ControllerContext
         ]]);
     }
 
+    /* Specific JWT details */
+    #[Route('/users-test', name: 'user-test', methods: ["HEAD", "GET"])]
+    public function userTest(): JsonResponse
+    {
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        return $this->json($decodedJwtToken, Response::HTTP_OK, []);
+    }
+
 
     /* Create user */
     #[Route('/user', name: 'user_create', methods: ["POST"])]
-    public function createUser(Request $request): JsonResponse
+    public function createUser(Request $request, UserPasswordHasherInterface $hasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -95,10 +120,16 @@ class UserController extends ControllerContext
         if (!empty($data["roles"])) {
             $user->setRoles($data["roles"]);
         }
-        $user->setPassword($data["password"]);
         $user->setFirstname($data["firstname"]);
         $user->setLastname($data["lastname"]);
         $user->setRegistrationAt(new DateTime());
+
+        $hashPassword = $this->hasher->hashPassword(
+            $user,
+            $data['password']
+        );
+        $user->setPassword($hashPassword);
+        
         $this->userRepository->add($user, true);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => [

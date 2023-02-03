@@ -45,7 +45,7 @@ class Sprint
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->userstories = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
     }
 
     public function getId(): ?int

@@ -19,6 +19,7 @@ class TicketController extends ControllerContext
     private $ticketRepository;
     private $statusRepository;
     private $levelGroupRepository;
+    private $ticketTypeRepository;
 
     public function __construct(
         TicketRepository $ticketRepository,
