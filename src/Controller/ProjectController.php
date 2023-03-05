@@ -6,27 +6,49 @@ use DateTime;
 use App\Entity\Project;
 use App\Context\ControllerContext;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ProjectController extends ControllerContext
 {
     private $projectRepository;
+    private $jwtManager;
+    private $tokenStorageInterface;
+    private $userRepository;
+    private $currentUser;
 
-    public function __construct(ProjectRepository $projectRepository)
-    {
+    public function __construct(
+        ProjectRepository $projectRepository,
+        UserRepository $userRepository,
+        TokenStorageInterface $tokenStorageInterface,
+        JWTTokenManagerInterface $jwtManager
+    ) {
         $this->projectRepository = $projectRepository;
+        $this->userRepository = $userRepository;
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+        // Get user from the token
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+        $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
     }
 
     /* List all Project */
     #[Route('/project-list', name: 'project_list', methods: ["HEAD", "GET"])]
     public function projectList(): JsonResponse
     {
-        $project = $this->projectRepository->findAllNotDeleted();
+        // Get all project for this user
+        $userProjects = $this->currentUser->getUserProjects();
+        $projects = [];
+        foreach ($userProjects as $userProject) {
+            array_push($projects, $userProject->getProject());
+        }
 
-        return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project']);
+        return $this->json($projects, Response::HTTP_OK, [], ['groups' => 'project']);
     }
 
 
