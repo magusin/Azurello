@@ -5,8 +5,12 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\Project;
 use App\Context\ControllerContext;
+use App\Entity\UserProject;
+use App\Entity\UserType;
 use App\Repository\ProjectRepository;
+use App\Repository\UserProjectRepository;
 use App\Repository\UserRepository;
+use App\Repository\UserTypeRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +21,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ProjectController extends ControllerContext
 {
     private $projectRepository;
+    private $userProjectRepository;
+    private $userTypeRepository;
     private $jwtManager;
     private $tokenStorageInterface;
     private $userRepository;
@@ -25,11 +31,15 @@ class ProjectController extends ControllerContext
     public function __construct(
         ProjectRepository $projectRepository,
         UserRepository $userRepository,
+        UserTypeRepository $userTypeRepository,
+        UserProjectRepository $userProjectRepository,
         TokenStorageInterface $tokenStorageInterface,
         JWTTokenManagerInterface $jwtManager
     ) {
         $this->projectRepository = $projectRepository;
         $this->userRepository = $userRepository;
+        $this->userTypeRepository = $userTypeRepository;
+        $this->userProjectRepository = $userProjectRepository;
         $this->jwtManager = $jwtManager;
         $this->tokenStorageInterface = $tokenStorageInterface;
         // Get user from the token
@@ -112,6 +122,7 @@ class ProjectController extends ControllerContext
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
+        // Create project
         $project = new Project();
         $project->setName($data["name"]);
         if (!empty($data["description"])) {
@@ -120,6 +131,19 @@ class ProjectController extends ControllerContext
         $project->setCreatedAt(new DateTime());
         $project->setCreatedBy($data["created_by"]);
         $this->projectRepository->add($project, true);
+
+        // Create defaut user type
+        $userType = new UserType();
+        $userType->setProject($project);
+        $userType->setLabel("Administrator");
+        $this->userTypeRepository->add($userType, true);
+
+        // Bind current user with project
+        $userProject = new UserProject();
+        $userProject->setProject($project);
+        $userProject->setUser($this->currentUser);
+        $userProject->setUserType($userType);
+        $this->userProjectRepository->add($userProject, true);
 
         return $this->json($project, Response::HTTP_CREATED, [], ['groups' => ['project']]);
     }
