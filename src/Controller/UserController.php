@@ -25,25 +25,19 @@ class UserController extends ControllerContext
     private $sprintRepository;
     private $userProjectRepository;
     private $hasher;
-    private $jwtManager;
-    private $tokenStorageInterface;
 
     public function __construct(
         UserRepository $userRepository,
         TicketTaskRepository $ticketTaskRepository,
         SprintRepository $sprintRepository,
         UserProjectRepository $userProjectRepository,
-        UserPasswordHasherInterface $hasher,
-        TokenStorageInterface $tokenStorageInterface,
-        JWTTokenManagerInterface $jwtManager
+        UserPasswordHasherInterface $hasher
     ) {
         $this->userRepository = $userRepository;
         $this->ticketTaskRepository = $ticketTaskRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
         $this->hasher = $hasher;
-        $this->jwtManager = $jwtManager;
-        $this->tokenStorageInterface = $tokenStorageInterface;
     }
 
     
@@ -88,16 +82,6 @@ class UserController extends ControllerContext
             'user_userProject', 'userProject'
         ]]);
     }
-
-    /* Specific JWT details */
-    #[Route('/users-test', name: 'user-test', methods: ["HEAD", "GET"])]
-    public function userTest(): JsonResponse
-    {
-        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-
-        return $this->json($decodedJwtToken, Response::HTTP_OK, []);
-    }
-
 
     /* Create user */
     #[Route('/user', name: 'user_create', methods: ["POST"])]
