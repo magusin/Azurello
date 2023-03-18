@@ -55,7 +55,10 @@ class ProjectController extends ControllerContext
         $userProjects = $this->currentUser->getUserProjects();
         $projects = [];
         foreach ($userProjects as $userProject) {
-            array_push($projects, $userProject->getProject());
+            $project = $userProject->getProject();
+            if ($project->getDeletedAt() == null) {
+                array_push($projects, $userProject->getProject());
+            }
         }
 
         return $this->json($projects, Response::HTTP_OK, [], ['groups' => 'project']);
@@ -116,8 +119,7 @@ class ProjectController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["name"]) ||
-            empty($data["created_by"])
+            empty($data["name"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
@@ -129,7 +131,7 @@ class ProjectController extends ControllerContext
             $project->setDescription($data["description"]);
         }
         $project->setCreatedAt(new DateTime());
-        $project->setCreatedBy($data["created_by"]);
+        $project->setCreatedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
         $this->projectRepository->add($project, true);
 
         // Create defaut user type
@@ -156,13 +158,6 @@ class ProjectController extends ControllerContext
         $data = json_decode($request->getContent(), true);
         $project = $this->projectRepository->find($id);
 
-        // Check JSON body
-        if (
-            empty($data["updated_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
-
         // Check if project exists
         if (!$project) {
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
@@ -179,7 +174,7 @@ class ProjectController extends ControllerContext
         if (!empty($data["description"])) {
             $project->setDescription($data["description"]);
         }
-        $project->setUpdatedBy($data["updated_by"]);
+        $project->setUpdatedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
         $project->setUpdatedAt(new DateTime());
 
         $this->projectRepository->add($project, true);
@@ -200,15 +195,7 @@ class ProjectController extends ControllerContext
     #[Route('/project/{id}', name: 'project_delete', methods: ["DELETE"])]
     public function deleteProject(Request $request, int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
         $project = $this->projectRepository->find($id);
-
-        // Check JSON body
-        if (
-            empty($data["deleted_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
 
         // Check if project exists
         if (!$project) {
@@ -221,7 +208,7 @@ class ProjectController extends ControllerContext
         }
 
         $project->setDeletedAt(new DateTime());
-        $project->setDeletedBy($data["deleted_by"]);
+        $project->setDeletedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
         $this->projectRepository->add($project, true);
 
         return $this->json($this->successEntityDeleted("project"), Response::HTTP_OK);
