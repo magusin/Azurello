@@ -53,10 +53,6 @@ class Project
     #[ORM\OneToMany(targetEntity: UserType::class, mappedBy: "project")]
     private Collection $userTypes;
 
-    #[Groups(['project_levelGroup'])]
-    #[ORM\OneToMany(targetEntity: LevelGroup::class, mappedBy: "project")]
-    private Collection $levelGroups;
-
     #[Groups(['project_status'])]
     #[ORM\OneToMany(targetEntity: Status::class, mappedBy: "project")]
     private Collection $status;
@@ -76,7 +72,6 @@ class Project
     public function __construct()
     {
         $this->userTypes = new ArrayCollection();
-        $this->levelGroups = new ArrayCollection();
         $this->status = new ArrayCollection();
         $this->sprints = new ArrayCollection();
         $this->userProjects = new ArrayCollection();
@@ -208,36 +203,6 @@ class Project
             // set the owning side to null (unless already changed)
             if ($userType->getProject() === $this) {
                 $userType->setProject(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Group>
-     */
-    public function getLevelGroups(): Collection
-    {
-        return $this->levelGroups;
-    }
-
-    public function addLevelGroups(LevelGroup $levelGroup): self
-    {
-        if (!$this->levelGroups->contains($levelGroup)) {
-            $this->levelGroups->add($levelGroup);
-            $levelGroup->setProject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLevelGroups(LevelGroup $levelGroup): self
-    {
-        if ($this->levelGroups->removeElement($levelGroup)) {
-            // set the owning side to null (unless already changed)
-            if ($levelGroup->getProject() === $this) {
-                $levelGroup->setProject(null);
             }
         }
 

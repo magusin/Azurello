@@ -50,10 +50,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sprint::class, mappedBy: 'user')]
     private Collection $sprints;
 
-    #[Groups(['user_ticketTask'])]
-    #[ORM\OneToMany(targetEntity: TicketTask::class, mappedBy: 'user')]
-    private Collection $ticketTasks;
-
     #[Groups(['user_userProject'])]
     #[ORM\OneToMany(targetEntity: UserProject::class, mappedBy: 'user')]
     private Collection $userProjects;
@@ -65,7 +61,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
-        $this->ticketTasks = new ArrayCollection();
         $this->userProjects = new ArrayCollection();
         $this->tickets = new ArrayCollection();
     }
@@ -229,36 +224,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->sprints->removeElement($sprint)) {
             $sprint->removeUser($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TicketTask>
-     */
-    public function getTicketTasks(): Collection
-    {
-        return $this->ticketTasks;
-    }
-
-    public function addTicketTask(TicketTask $ticketTask): self
-    {
-        if (!$this->ticketTasks->contains($ticketTask)) {
-            $this->ticketTasks->add($ticketTask);
-            $ticketTask->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTicketTask(TicketTask $ticketTask): self
-    {
-        if ($this->ticketTasks->removeElement($ticketTask)) {
-            // set the owning side to null (unless already changed)
-            if ($ticketTask->getUser() === $this) {
-                $ticketTask->setUser(null);
-            }
         }
 
         return $this;

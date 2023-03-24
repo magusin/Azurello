@@ -45,9 +45,15 @@ class Ticket
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deletedBy;
 
-    #[Groups(['ticket_levelGroup'])]
-    #[ORM\ManyToOne(targetEntity: LevelGroup::class, inversedBy: 'tickets')]
-    private LevelGroup $levelGroup;
+    #[Groups(['ticket_childrens'])]
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'parent')]
+    #[ORM\JoinColumn(nullable: true)]
+    private Collection $childrens;
+
+    #[Groups(['ticket_parent'])]
+    #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'childrens')]
+    #[ORM\JoinColumn(nullable: true)]
+    private Ticket $parent;
 
     #[Groups(['ticket_status'])]
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'tickets')]
@@ -57,10 +63,6 @@ class Ticket
     #[Groups(['ticket_sprint'])]
     #[ORM\ManyToMany(targetEntity: Sprint::class, inversedBy: 'tickets')]
     private Collection $sprints;
-
-    #[Groups(['ticket_ticketTask'])]
-    #[ORM\OneToMany(targetEntity: TicketTask::class, mappedBy: 'ticket')]
-    private Collection $ticketTasks;
 
     #[Groups(['ticket_ticketType'])]
     #[ORM\ManyToOne(inversedBy: 'tickets')]
@@ -74,7 +76,7 @@ class Ticket
     public function __construct()
     {
         $this->sprints = new ArrayCollection();
-        $this->ticketTasks = new ArrayCollection();
+        $this->childrens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,6 +92,55 @@ class Ticket
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getParent(): ?Ticket
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?Ticket $ticket): self
+    {
+        $this->parent = $ticket;
+
+        return $this;
+    }
+
+    public function removeParent(): self
+    {
+        unset($this->parent);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getChildrens(): Collection
+    {
+        return $this->childrens;
+    }
+
+    public function addChildren(Ticket $ticket): self
+    {
+        if (!$this->childrens->contains($ticket)) {
+            $this->childrens->add($ticket);
+            $ticket->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChildren(Ticket $ticket): self
+    {
+        if ($this->childrens->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getParent() === $this) {
+                $ticket->setParent(null);
+            }
+        }
 
         return $this;
     }
@@ -166,18 +217,6 @@ class Ticket
         return $this;
     }
 
-    public function getLevelGroup(): ?LevelGroup
-    {
-        return $this->levelGroup;
-    }
-
-    public function setLevelGroup(?LevelGroup $levelGroup): self
-    {
-        $this->levelGroup = $levelGroup;
-
-        return $this;
-    }
-
     public function getStatus(): ?Status
     {
         return $this->status;
@@ -210,36 +249,6 @@ class Ticket
     public function removeSprint(sprint $sprint): self
     {
         $this->sprints->removeElement($sprint);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TicketTask>
-     */
-    public function getTicketTasks(): Collection
-    {
-        return $this->ticketTasks;
-    }
-
-    public function addTicketTask(TicketTask $ticketTask): self
-    {
-        if (!$this->ticketTasks->contains($ticketTask)) {
-            $this->ticketTasks->add($ticketTask);
-            $ticketTask->setTicket($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTicketTask(TicketTask $ticketTask): self
-    {
-        if ($this->ticketTasks->removeElement($ticketTask)) {
-            // set the owning side to null (unless already changed)
-            if ($ticketTask->getTicket() === $this) {
-                $ticketTask->setTicket(null);
-            }
-        }
 
         return $this;
     }

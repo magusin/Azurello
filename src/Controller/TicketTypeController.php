@@ -31,21 +31,41 @@ class TicketTypeController extends ControllerContext
 
     /* List all ticketType */
     #[Route('/ticket-type-list', name: 'ticketType_list', methods: ["HEAD", "GET"])]
-    public function ticketTypeList(): JsonResponse
+    public function ticketTypeList(Request $request): JsonResponse
     {
-        $ticketType = $this->ticketTypeRepository->findAll();
+        $data = json_decode($request->getContent(), true);
 
-        return $this->json($ticketType, Response::HTTP_OK, [], ['groups' => ['ticketType']]);
+        // Check JSON body
+        if (
+            empty($data["project_id"])
+        ) {
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        }
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        $ticketTypeList = $project->getTicketTypes();
+
+        return $this->json($ticketTypeList, Response::HTTP_OK, [], ['groups' => ['ticketType']]);
     }
 
 
     /* List all ticketType on details */
     #[Route('/ticket-type-list-details', name: 'ticketType_list_details', methods: ["HEAD", "GET"])]
-    public function ticketTypeDetails(): JsonResponse
+    public function ticketTypeDetails(Request $request): JsonResponse
     {
-        $ticketType = $this->ticketTypeRepository->findAll();
+        $data = json_decode($request->getContent(), true);
 
-        return $this->json($ticketType, Response::HTTP_OK, [], ['groups' => [
+        // Check JSON body
+        if (
+            empty($data["project_id"])
+        ) {
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        }
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        $ticketTypeList = $project->getTicketTypes();
+
+        return $this->json($ticketTypeList, Response::HTTP_OK, [], ['groups' => [
             'ticketType',
             'ticketType_ticket', 'ticket',
             'ticketType_project', 'project'

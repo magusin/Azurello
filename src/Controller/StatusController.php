@@ -59,7 +59,6 @@ class StatusController extends ControllerContext
         }
         return $this->json($status, Response::HTTP_OK, [], ['groups' => [
             'status',
-            'status_ticketTask', 'ticketTask',
             'status_ticket', 'ticket',
             'status_project', 'project'
         ]]);
