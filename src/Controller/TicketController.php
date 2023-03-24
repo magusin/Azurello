@@ -5,32 +5,48 @@ namespace App\Controller;
 use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\Ticket;
-use App\Repository\LevelGroupRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\StatusRepository;
 use App\Repository\TicketRepository;
 use App\Repository\TicketTypeRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TicketController extends ControllerContext
 {
     private $ticketRepository;
     private $statusRepository;
-    private $levelGroupRepository;
     private $ticketTypeRepository;
+    private $jwtManager;
+    private $tokenStorageInterface;
+    private $userRepository;
+    private $currentUser;
+    private $projectRepository;
 
     public function __construct(
         TicketRepository $ticketRepository,
         StatusRepository $statusRepository,
-        LevelGroupRepository $levelGroupRepository,
-        TicketTypeRepository $ticketTypeRepository
+        TicketTypeRepository $ticketTypeRepository,
+        TokenStorageInterface $tokenStorageInterface,
+        JWTTokenManagerInterface $jwtManager,
+        UserRepository $userRepository,
+        ProjectRepository $projectRepository
     ) {
         $this->ticketRepository = $ticketRepository;
         $this->statusRepository = $statusRepository;
-        $this->levelGroupRepository = $levelGroupRepository;
         $this->ticketTypeRepository = $ticketTypeRepository;
+        $this->userRepository = $userRepository;
+        $this->projectRepository = $projectRepository;
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+        // Get user from the token
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+        $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
     }
 
 
@@ -40,7 +56,12 @@ class TicketController extends ControllerContext
     {
         $ticket = $this->ticketRepository->findAllNotDeleted();
 
-        return $this->json($ticket, Response::HTTP_OK, [], ['groups' => ['ticket']]);
+        return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
+            'ticket',
+            'ticket_childrens',
+            'ticket_ticketType', 'ticketType',
+            'ticket_status', 'status',
+        ]]);
     }
 
 
@@ -52,12 +73,11 @@ class TicketController extends ControllerContext
 
         return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
             'ticket',
-            'ticket_levelGroup', 'levelGroup',
+            'ticket_childrens',
             'ticket_status', 'status',
+            'ticket_ticketType', 'ticketType',
             'ticket_sprint', 'sprint',
-            'ticket_type', 'type',
-            'ticket_user', 'user',
-            'ticket_task', 'task'
+            'ticket_user', 'user'
         ]]);
     }
 
@@ -80,12 +100,11 @@ class TicketController extends ControllerContext
 
         return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
             'ticket',
-            'ticket_levelGroup', 'levelGroup',
+            'ticket_childrens',
             'ticket_status', 'status',
+            'ticket_ticketType', 'ticketType',
             'ticket_sprint', 'sprint',
-            'ticket_type', 'type',
-            'ticket_user', 'user',
-            'ticket_task', 'task'
+            'ticket_user', 'user'
         ]]);
     }
 
@@ -96,52 +115,54 @@ class TicketController extends ControllerContext
     {
         $data = json_decode($request->getContent(), true);
 
+        // Check if the user is in this project && have access to this function
+
+        
         // Check JSON body
         if (
             empty($data["name"]) ||
-            empty($data["created_by"]) ||
-            empty($data["status_id"]) ||
-            empty($data["level_group_id"]) ||
+            empty($data["project_id"]) ||
             empty($data["ticket_type_id"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
         }
 
-        $status = $this->statusRepository->find($data["status_id"]);
-        // Check if status exists
-        if (!$status) {
-            return $this->json($this->errorMessageEntityNotFound("status"), Response::HTTP_BAD_REQUEST);
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        $levelGroup = $this->levelGroupRepository->find($data["level_group_id"]);
-        // Check if level group exists
-        if (!$levelGroup) {
-            return $this->json($this->errorMessageEntityNotFound("levelGroup"), Response::HTTP_BAD_REQUEST);
+        // Check if project is not deleted
+        if ($project->getDeletedBy(!null)) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
         $ticketType = $this->ticketTypeRepository->find($data["ticket_type_id"]);
-        // Check if ticket type exists
-        if (!$ticketType) {
+        // Check if ticket type exists && exists in this project
+        if (!$ticketType || !$project->getTicketTypes()->contains($ticketType)) {
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
         }
 
         $ticket = new Ticket();
         $ticket->setName($data["name"]);
-        $ticket->setStatus($status);
+        $ticket->setStatus($project->getStatus()[0]);
         $ticket->setTicketType($ticketType);
-        $ticket->setLevelGroup($levelGroup);
+        if (!empty($data["ticket_parent_id"])) {
+            $ticket->setParent($data["ticket_parent_id"]);
+        }
         $ticket->setCreatedAt(new DateTime());
-        $ticket->setCreatedBy($data["created_by"]);
+        $ticket->setCreatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->ticketRepository->add($ticket, true);
 
         return $this->json($ticket, Response::HTTP_CREATED, [], ['groups' => [
             'ticket',
-            'ticket_levelGroup', 'levelGroup',
+            'ticket_parent',
             'ticket_status', 'status',
+            'ticket_ticketType', 'ticketType',
             'ticket_sprint', 'sprint',
-            'ticket_type', 'type',
-            'ticket_user', 'user',
-            'ticket_task', 'task'
+            'ticket_user', 'user'
         ]]);
     }
 
@@ -152,13 +173,6 @@ class TicketController extends ControllerContext
     {
         $data = json_decode($request->getContent(), true);
         $ticket = $this->ticketRepository->find($id);
-
-        // Check JSON body
-        if (
-            empty($data["updated_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
 
         // Check if ticket exists
         if (!$ticket) {
@@ -183,25 +197,15 @@ class TicketController extends ControllerContext
             $ticket->setStatus($status);
         }
 
-        if (!empty($data['level_group_id'])) {
-            $levelGroup = $this->levelGroupRepository->find($data["lvel_group_id"]);
-            // Check if levelGroup exists
-            if (!$levelGroup) {
-                return $this->json($this->errorMessageEntityNotFound("levelGroup"), Response::HTTP_BAD_REQUEST);
-            }
-            $ticket->setLevelGroup($levelGroup);
-        }
-
         $ticket->setUpdatedAt(new DateTime());
-        $ticket->setUpdatedBy($data["updated_by"]);
+        $ticket->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->ticketRepository->add($ticket, true);
 
         return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
             'ticket',
-            'ticket_levelGroup', 'levelGroup',
             'ticket_status', 'status',
             'ticket_sprint', 'sprint',
-            'ticket_type', 'type',
+            'ticket_ticketType', 'ticketType',
             'ticket_user', 'user',
             'ticket_task', 'task'
         ]]);
@@ -212,15 +216,7 @@ class TicketController extends ControllerContext
     #[Route('/ticket/{id}', name: 'ticket_delete', methods: ["DELETE"])]
     public function deleteTicket(Request $request, int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
         $ticket = $this->ticketRepository->find($id);
-
-        // Check JSON body
-        if (
-            empty($data["deleted_by"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
 
         // Check if ticket exists
         if (!$ticket) {
@@ -233,7 +229,7 @@ class TicketController extends ControllerContext
         }
 
         $ticket->setDeletedAt(new DateTime());
-        $ticket->setDeletedBy($data["deleted_by"]);
+        $ticket->setDeletedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->ticketRepository->add($ticket, true);
 
         return $this->json($this->successEntityDeleted("ticket"), Response::HTTP_OK);

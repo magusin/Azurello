@@ -6,7 +6,6 @@ use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Repository\TicketTaskRepository;
 use App\Repository\SprintRepository;
 use App\Repository\UserProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,36 +13,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 
 class UserController extends ControllerContext
 {
     private $userRepository;
-    private $ticketTaskRepository;
     private $sprintRepository;
     private $userProjectRepository;
     private $hasher;
-    private $jwtManager;
-    private $tokenStorageInterface;
 
     public function __construct(
         UserRepository $userRepository,
-        TicketTaskRepository $ticketTaskRepository,
         SprintRepository $sprintRepository,
         UserProjectRepository $userProjectRepository,
-        UserPasswordHasherInterface $hasher,
-        TokenStorageInterface $tokenStorageInterface,
-        JWTTokenManagerInterface $jwtManager
+        UserPasswordHasherInterface $hasher
     ) {
         $this->userRepository = $userRepository;
-        $this->ticketTaskRepository = $ticketTaskRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
         $this->hasher = $hasher;
-        $this->jwtManager = $jwtManager;
-        $this->tokenStorageInterface = $tokenStorageInterface;
     }
 
     
@@ -66,7 +53,6 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
@@ -84,20 +70,9 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
-
-    /* Specific JWT details */
-    #[Route('/users-test', name: 'user-test', methods: ["HEAD", "GET"])]
-    public function userTest(): JsonResponse
-    {
-        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-
-        return $this->json($decodedJwtToken, Response::HTTP_OK, []);
-    }
-
 
     /* Create user */
     #[Route('/user', name: 'user_create', methods: ["POST"])]
@@ -135,7 +110,6 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => [
             'user',
             'user_sprint', 'sprint',
-            'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }
@@ -169,15 +143,6 @@ class UserController extends ControllerContext
             $user->setFirstname($data["firstname"]);
         }
 
-        if (!empty($data["ticketTask_id"])) {
-            $ticketTask = $this->ticketTaskRepository->find($data["ticketTask_id"]);
-            // Check if ticketTask exists
-            if (!$ticketTask) {
-                return $this->json($this->errorMessageEntityNotFound("ticketTask"), Response::HTTP_BAD_REQUEST);
-            }
-            $user->addTicketTask($ticketTask);
-        }
-
         if (!empty($data["sprint_id"])) {
             $sprint = $this->sprintRepository->find($data["sprint_id"]);
             // Check if sprint exists
@@ -201,7 +166,6 @@ class UserController extends ControllerContext
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
             'user',
             // 'user_sprint', 'sprint',
-            // 'user_ticketTask', 'ticketTask',
             'user_userProject', 'userProject'
         ]]);
     }

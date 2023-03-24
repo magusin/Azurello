@@ -25,10 +25,6 @@ class Status
     #[ORM\OneToMany(mappedBy: 'status', targetEntity: Ticket::class, orphanRemoval: true)]
     private Collection $tickets;
 
-    #[Groups(['status_ticketTask'])]
-    #[ORM\OneToMany(mappedBy: 'status', targetEntity: TicketTask::class, orphanRemoval: true)]
-    private Collection $ticketTasks;
-
     #[Groups(['status_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'status')]
     #[ORM\JoinColumn(nullable: false)]
@@ -37,7 +33,6 @@ class Status
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
-        $this->ticketTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -81,36 +76,6 @@ class Status
             // set the owning side to null (unless already changed)
             if ($ticket->getStatus() === $this) {
                 $ticket->setStatus(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TicketTask>
-     */
-    public function getTicketTasks(): Collection
-    {
-        return $this->ticketTasks;
-    }
-
-    public function addTicketTask(TicketTask $ticketTask): self
-    {
-        if (!$this->ticketTasks->contains($ticketTask)) {
-            $this->ticketTasks->add($ticketTask);
-            $ticketTask->setStatus($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTicketTask(TicketTask $ticketTask): self
-    {
-        if ($this->ticketTasks->removeElement($ticketTask)) {
-            // set the owning side to null (unless already changed)
-            if ($ticketTask->getStatus() === $this) {
-                $ticketTask->setStatus(null);
             }
         }
 

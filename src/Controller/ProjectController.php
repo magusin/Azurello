@@ -5,17 +5,21 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\Project;
 use App\Context\ControllerContext;
+use App\Entity\Status;
+use App\Entity\TicketType;
 use App\Entity\UserProject;
 use App\Entity\UserType;
 use App\Repository\ProjectRepository;
+use App\Repository\StatusRepository;
+use App\Repository\TicketTypeRepository;
 use App\Repository\UserProjectRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserTypeRepository;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ProjectController extends ControllerContext
@@ -23,9 +27,11 @@ class ProjectController extends ControllerContext
     private $projectRepository;
     private $userProjectRepository;
     private $userTypeRepository;
+    private $userRepository;
+    private $statusRepository;
+    private $ticketTypeRepository;
     private $jwtManager;
     private $tokenStorageInterface;
-    private $userRepository;
     private $currentUser;
 
     public function __construct(
@@ -33,6 +39,8 @@ class ProjectController extends ControllerContext
         UserRepository $userRepository,
         UserTypeRepository $userTypeRepository,
         UserProjectRepository $userProjectRepository,
+        TicketTypeRepository $ticketTypeRepository,
+        StatusRepository $statusRepository,
         TokenStorageInterface $tokenStorageInterface,
         JWTTokenManagerInterface $jwtManager
     ) {
@@ -40,6 +48,9 @@ class ProjectController extends ControllerContext
         $this->userRepository = $userRepository;
         $this->userTypeRepository = $userTypeRepository;
         $this->userProjectRepository = $userProjectRepository;
+        $this->ticketTypeRepository = $ticketTypeRepository;
+        $this->statusRepository = $statusRepository;
+
         $this->jwtManager = $jwtManager;
         $this->tokenStorageInterface = $tokenStorageInterface;
         // Get user from the token
@@ -77,7 +88,6 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup',
             'project_ticketType', 'ticketType'
         ]]);
     }
@@ -102,11 +112,10 @@ class ProjectController extends ControllerContext
         return $this->json($project, Response::HTTP_OK, [], ['groups' => [
             'project',
             'project_userType', 'userType',
-            'project_userProject', 'userProject',
+            'project_userProject', 'userProject', 'userProject_user',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup',
-            'project_ticketType', 'ticketType'
+            'project_ticketType', 'ticketType', 'ticket', 'ticket_children'
         ]]);
     }
 
@@ -139,6 +148,34 @@ class ProjectController extends ControllerContext
         $userType->setProject($project);
         $userType->setLabel("Administrator");
         $this->userTypeRepository->add($userType, true);
+
+        // Create defaut ticket type
+        $ticketType = new TicketType();
+        $ticketType->setProject($project);
+        $ticketType->setName("UserStory");
+        $ticketType2 = new TicketType();
+        $ticketType2->setProject($project);
+        $ticketType2->setName("Bug");
+        $ticketType3 = new TicketType();
+        $ticketType3->setProject($project);
+        $ticketType3->setName("Test");
+        $this->ticketTypeRepository->add($ticketType, true);
+        $this->ticketTypeRepository->add($ticketType2, true);
+        $this->ticketTypeRepository->add($ticketType3, true);
+
+        // Create defaut status
+        $status = new Status();
+        $status->setProject($project);
+        $status->setLabel("Todo");
+        $status2 = new Status();
+        $status2->setProject($project);
+        $status2->setLabel("In progress");
+        $status3 = new Status();
+        $status3->setProject($project);
+        $status3->setLabel("Closed");
+        $this->statusRepository->add($status, true);
+        $this->statusRepository->add($status2, true);
+        $this->statusRepository->add($status3, true);
 
         // Bind current user with project
         $userProject = new UserProject();
@@ -185,11 +222,9 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_levelGroup', 'levelGroup',
             'project_ticketType', 'ticketType'
         ]]);
     }
-
 
     /* Soft Delete Project */
     #[Route('/project/{id}', name: 'project_delete', methods: ["DELETE"])]

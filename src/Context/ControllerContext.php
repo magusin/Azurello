@@ -30,13 +30,14 @@ class ControllerContext extends AbstractController
     {
         return "There is no relation between $entityName1 & $entityName2";
     }
-    
+
     protected function errorMessageRelationItself(string $entityName)
     {
         return "Cannont add a relation between $entityName and itself";
     }
 
-    protected function successEntityDeleted(string $entityName) {
+    protected function successEntityDeleted(string $entityName)
+    {
         return "$entityName is successfully deleted";
     }
 }
