@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends ControllerContext
 {
@@ -20,20 +22,30 @@ class UserController extends ControllerContext
     private $sprintRepository;
     private $userProjectRepository;
     private $hasher;
+    private $jwtManager;
+    private $tokenStorageInterface;
+    private $currentUser;
 
     public function __construct(
         UserRepository $userRepository,
         SprintRepository $sprintRepository,
         UserProjectRepository $userProjectRepository,
-        UserPasswordHasherInterface $hasher
+        UserPasswordHasherInterface $hasher,
+        TokenStorageInterface $tokenStorageInterface,
+        JWTTokenManagerInterface $jwtManager
     ) {
         $this->userRepository = $userRepository;
         $this->sprintRepository = $sprintRepository;
         $this->userProjectRepository = $userProjectRepository;
         $this->hasher = $hasher;
+
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+        // Get user from the token
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+        $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
     }
 
-    
     /* List all User */
     #[Route('/user-list', name: 'user_list', methods: ["HEAD", "GET"])]
     public function userList(): JsonResponse
@@ -58,19 +70,13 @@ class UserController extends ControllerContext
     }
 
     /* Specific User details */
-    #[Route('/user/{id}', name: 'user-details', methods: ["HEAD", "GET"])]
-    public function user(int $id): JsonResponse
+    #[Route('/user', name: 'user-details', methods: ["HEAD", "GET"])]
+    public function user(): JsonResponse
     {
-        $user = $this->userRepository->find($id);
+        $user = $this->currentUser;
 
-        // Check if user exists
-        if (!$user) {
-            return $this->json($this->errorMessageEntityNotFound("user"), Response::HTTP_BAD_REQUEST);
-        }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => [
-            'user',
-            // 'user_sprint', 'sprint',
-            'user_userProject', 'userProject'
+            'user'
         ]]);
     }
 

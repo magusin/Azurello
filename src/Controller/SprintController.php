@@ -27,9 +27,31 @@ class SprintController extends ControllerContext
 
     /* List all Sprint */
     #[Route('/sprint-list', name: 'sprint_list', methods: ["HEAD", "GET"])]
-    public function sprintList(): JsonResponse
+    public function sprintList(Request $request): JsonResponse
     {
-        $sprint = $this->sprintRepository->findAll();
+        $data = json_decode($request->getContent(), true);
+
+        // Check JSON body
+        if (
+            empty($data["project_id"])
+        ) {
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if project is not deleted
+        if ($project->getDeletedBy(!null)) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Get all sprint for this project
+        $sprint = $project->getSprints();
 
         return $this->json($sprint, Response::HTTP_OK, [], ['groups' => ['sprint']]);
     }
