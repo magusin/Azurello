@@ -5,11 +5,13 @@ namespace App\Controller;
 use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\Ticket;
+use App\Entity\TicketType;
 use App\Repository\ProjectRepository;
 use App\Repository\StatusRepository;
 use App\Repository\TicketRepository;
 use App\Repository\TicketTypeRepository;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -52,11 +54,38 @@ class TicketController extends ControllerContext
 
     /* List all ticket */
     #[Route('/ticket-list', name: 'ticket_list', methods: ["HEAD", "GET"])]
-    public function ticketList(): JsonResponse
+    public function ticketList(Request $request): JsonResponse
     {
-        $ticket = $this->ticketRepository->findAllNotDeleted();
+        $data = json_decode($request->getContent(), true);
 
-        return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
+        // Check JSON body
+        if (
+            empty($data["project_id"])
+        ) {
+            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if project is not deleted
+        if ($project->getDeletedBy(!null)) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Get all ticket for each ticket type for this project
+        $ticketList = new ArrayCollection();
+        $project->getTicketTypes()->map(function (TicketType $ticketType) use (&$ticketList) {
+            foreach ($ticketType->getTickets() as $ticket) {
+                $ticketList->add($ticket);
+            }
+        });
+
+        return $this->json($ticketList, Response::HTTP_OK, [], ['groups' => [
             'ticket',
             'ticket_childrens',
             'ticket_ticketType', 'ticketType',
@@ -117,7 +146,7 @@ class TicketController extends ControllerContext
 
         // Check if the user is in this project && have access to this function
 
-        
+
         // Check JSON body
         if (
             empty($data["name"]) ||
