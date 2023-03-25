@@ -12,3 +12,7 @@ kernel:
 
 api_login_check:
     path: /api/login
+
+logout:
+    path: /api/logout
+    controller: App\Controller\SecurityController::logout

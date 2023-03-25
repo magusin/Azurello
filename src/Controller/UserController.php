@@ -42,8 +42,10 @@ class UserController extends ControllerContext
         $this->jwtManager = $jwtManager;
         $this->tokenStorageInterface = $tokenStorageInterface;
         // Get user from the token
-        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-        $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
+        if ($this->tokenStorageInterface->getToken() != null) {
+            $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+            $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
+        }
     }
 
     /* List all User */
@@ -110,7 +112,7 @@ class UserController extends ControllerContext
             $data['password']
         );
         $user->setPassword($hashPassword);
-        
+
         $this->userRepository->add($user, true);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => [
