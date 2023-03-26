@@ -2,6 +2,8 @@
 
 namespace App\Context;
 
+use App\Entity\Project;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ControllerContext extends AbstractController
@@ -39,5 +41,18 @@ class ControllerContext extends AbstractController
     protected function successEntityDeleted(string $entityName)
     {
         return "$entityName is successfully deleted";
+    }
+
+    protected function isUserHaveRight(User $currentUser, Project $project): bool
+    {
+        $userProjects = $currentUser->getUserProjects();
+        if ($currentUser->getUserProjects()->count()) {
+            foreach ($userProjects as $userProject) {
+                if ($userProject->getProject() == $project) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
