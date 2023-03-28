@@ -10,8 +10,13 @@ kernel:
     resource: ../src/Kernel.php
     type: annotation
 
-api_login_check:
+api_login:
     path: /api/login
+    methods: [POST]
+
+api_refresh_token:
+    path: /api/token_refresh
+    methods: [POST]
 
 logout:
     path: /api/logout

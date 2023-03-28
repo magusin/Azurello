@@ -104,6 +104,11 @@ class ProjectController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
+        // Check if user have access to this project
+        if (!$this->isUserHaveRight($this->currentUser, $project)) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
@@ -115,7 +120,7 @@ class ProjectController extends ControllerContext
             'project_userProject', 'userProject', 'userProject_user',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_ticketType', 'ticketType', 'ticket', 'ticket_children'
+            'project_ticketType', 'ticketType_ticket', 'ticket', 'ticket_children'
         ]]);
     }
 
@@ -140,7 +145,7 @@ class ProjectController extends ControllerContext
             $project->setDescription($data["description"]);
         }
         $project->setCreatedAt(new DateTime());
-        $project->setCreatedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
+        $project->setCreatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->projectRepository->add($project, true);
 
         // Create defaut user type
@@ -211,7 +216,7 @@ class ProjectController extends ControllerContext
         if (!empty($data["description"])) {
             $project->setDescription($data["description"]);
         }
-        $project->setUpdatedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
+        $project->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $project->setUpdatedAt(new DateTime());
 
         $this->projectRepository->add($project, true);
@@ -243,7 +248,7 @@ class ProjectController extends ControllerContext
         }
 
         $project->setDeletedAt(new DateTime());
-        $project->setDeletedBy($this->currentUser->getFirstname()." ".$this->currentUser->getLastname());
+        $project->setDeletedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->projectRepository->add($project, true);
 
         return $this->json($this->successEntityDeleted("project"), Response::HTTP_OK);
