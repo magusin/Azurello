@@ -83,7 +83,7 @@ class UserController extends ControllerContext
     }
 
     /* Create user */
-    #[Route('/user', name: 'user_create', methods: ["POST"])]
+    #[Route('/create_account', name: 'user_create', methods: ["POST"])]
     public function createUser(Request $request, UserPasswordHasherInterface $hasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
