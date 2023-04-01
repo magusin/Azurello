@@ -21,27 +21,27 @@ class Ticket
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $createdBy;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $updatedBy;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $deletedAt;
 
-    #[Groups(['ticket'])]
+    #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'string', length: 45, nullable: true)]
     private $deletedBy;
 
@@ -53,7 +53,7 @@ class Ticket
     #[Groups(['ticket_parent'])]
     #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'childrens')]
     #[ORM\JoinColumn(nullable: true)]
-    private Ticket $parent;
+    private ?Ticket $parent = null;
 
     #[Groups(['ticket_status'])]
     #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'tickets')]
