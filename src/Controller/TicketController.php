@@ -81,7 +81,9 @@ class TicketController extends ControllerContext
         $ticketList = new ArrayCollection();
         $project->getTicketTypes()->map(function (TicketType $ticketType) use (&$ticketList) {
             foreach ($ticketType->getTickets() as $ticket) {
-                $ticketList->add($ticket);
+                if ($ticket->getParent() == null) {
+                    $ticketList->add($ticket);
+                }
             }
         });
 
@@ -157,12 +159,10 @@ class TicketController extends ControllerContext
         }
 
         $project = $this->projectRepository->find($data["project_id"]);
-
         // Check if project exists
         if (!$project) {
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
-
         // Check if project is not deleted
         if ($project->getDeletedBy(!null)) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
@@ -174,12 +174,30 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
         }
 
+        if (!empty($data["ticket_parent_id"])) {
+            $parentTicket = $this->ticketRepository->find($data["ticket_parent_id"]);
+            // Check if ticket exists
+            if (!$parentTicket) {
+                return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
+            }
+            // Check if ticket in this project
+            $asTicket = false;
+            $project->getTicketTypes()->map(function (TicketType $ticketType) use (&$parentTicket, &$asTicket) {
+                if ($ticketType->getTickets()->contains($parentTicket)) {
+                    $asTicket = true;
+                }
+            });
+            if (!$asTicket) {
+                return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         $ticket = new Ticket();
         $ticket->setName($data["name"]);
         $ticket->setStatus($project->getStatus()[0]);
         $ticket->setTicketType($ticketType);
         if (!empty($data["ticket_parent_id"])) {
-            $ticket->setParent($data["ticket_parent_id"]);
+            $ticket->setParent($parentTicket);
         }
         $ticket->setCreatedAt(new DateTime());
         $ticket->setCreatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
@@ -202,6 +220,8 @@ class TicketController extends ControllerContext
     {
         $data = json_decode($request->getContent(), true);
         $ticket = $this->ticketRepository->find($id);
+
+        // Check if ticketParent != ticket
 
         // Check if ticket exists
         if (!$ticket) {
