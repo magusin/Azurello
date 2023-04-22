@@ -53,19 +53,10 @@ class TicketController extends ControllerContext
 
 
     /* List all ticket */
-    #[Route('/ticket-list', name: 'ticket_list', methods: ["HEAD", "GET"])]
-    public function ticketList(Request $request): JsonResponse
+    #[Route('/ticket-list/{id}', name: 'ticket_list', methods: ["HEAD", "GET"])]
+    public function ticketList(int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
-        // Check JSON body
-        if (
-            empty($data["project_id"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
-        }
-
-        $project = $this->projectRepository->find($data["project_id"]);
+        $project = $this->projectRepository->find($id);
 
         // Check if project exists
         if (!$project) {

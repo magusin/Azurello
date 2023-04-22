@@ -124,16 +124,11 @@ class UserController extends ControllerContext
 
 
     /* Edit User */
-    #[Route('user/{id}', name: 'user_edit', methods: ["PATCH"])]
-    public function editUser(Request $request, int $id): JsonResponse
+    #[Route('user', name: 'user_edit', methods: ["PATCH"])]
+    public function editUser(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $user = $this->userRepository->find($id);
-
-        // Check if user exists
-        if (!$user) {
-            return $this->json($this->errorMessageEntityNotFound("user"), Response::HTTP_BAD_REQUEST);
-        }
+        $user = $this->currentUser;
 
         if (!empty($data["email"])) {
             $user->setEmail($data["email"]);
