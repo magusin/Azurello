@@ -120,6 +120,6 @@ class TicketSprintController extends ControllerContext
 
         $this->sprintRepository->add($sprint, true);
 
-        return $this->json($this->successEntityDeleted("sprint_sprint"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("sprint_sprint"), Response::HTTP_OK);
     }
 }

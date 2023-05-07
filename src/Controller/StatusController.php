@@ -49,7 +49,7 @@ class StatusController extends ControllerContext
 
     /* Specific status details */
     #[Route('/status/{id}', name: 'status_detail', methods: ["HEAD", "GET"])]
-    public function status(int $id): JsonResponse
+    public function status(String $id): JsonResponse
     {
         $status = $this->statusRepository->find($id);
 
@@ -86,8 +86,8 @@ class StatusController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -101,7 +101,7 @@ class StatusController extends ControllerContext
 
     /* Edit Status */
     #[Route('status/{id}', name: 'status_edit', methods: ["PATCH"])]
-    public function editStatus(Request $request, int $id): JsonResponse
+    public function editStatus(Request $request, String $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $status = $this->statusRepository->find($id);
@@ -121,8 +121,8 @@ class StatusController extends ControllerContext
             if (!$project) {
                 return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
             }
-            // Check if project is not deleted
-            if ($project->getDeletedBy(!null)) {
+            // Check if project is soft deleted
+            if ($project->getIsDeleted()) {
                 return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
             }
             $status->setProject($project);
@@ -138,7 +138,7 @@ class StatusController extends ControllerContext
 
     /* Hard Delete Status */
     #[Route('/status/{id}', name: 'status_delete', methods: ["DELETE"])]
-    public function deleteStatus(int $id): JsonResponse
+    public function deleteStatus(String $id): JsonResponse
     {
         $status = $this->statusRepository->find($id);
 
@@ -149,6 +149,6 @@ class StatusController extends ControllerContext
 
         $this->statusRepository->remove($status, true);
 
-        return $this->json($this->successEntityDeleted("status"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("status"), Response::HTTP_OK);
     }
 }

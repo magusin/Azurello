@@ -9,14 +9,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['user'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['user'])]
@@ -65,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tickets = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -203,7 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Sprint>
+     * @return Collection<Ulid, Sprint>
      */
     public function getSprints(): Collection
     {
@@ -230,7 +233,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, UserProject>
+     * @return Collection<Ulid, UserProject>
      */
     public function getUserProjects(): Collection
     {
@@ -260,7 +263,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Ticket>
+     * @return Collection<Ulid, Ticket>
      */
     public function getTickets(): Collection
     {

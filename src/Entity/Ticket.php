@@ -7,19 +7,26 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['ticket'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['ticket'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $name;
+
+    #[Groups(['ticket'])]
+    #[ORM\Column(type: 'integer')]
+    private $storyPoints;
 
     #[Groups(['ticket_detail'])]
     #[ORM\Column(type: 'datetime')]
@@ -38,12 +45,8 @@ class Ticket
     private $updatedBy;
 
     #[Groups(['ticket_detail'])]
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deletedAt;
-
-    #[Groups(['ticket_detail'])]
-    #[ORM\Column(type: 'string', length: 45, nullable: true)]
-    private $deletedBy;
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isDeleted = false;
 
     #[Groups(['ticket_childrens'])]
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'parent')]
@@ -79,7 +82,7 @@ class Ticket
         $this->childrens = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -92,6 +95,18 @@ class Ticket
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getStoryPoints(): int
+    {
+        return $this->storyPoints;
+    }
+
+    public function setStoryPoints(int $storyPoints): self
+    {
+        $this->storyPoints = $storyPoints;
 
         return $this;
     }
@@ -116,7 +131,7 @@ class Ticket
     }
 
     /**
-     * @return Collection<int, Ticket>
+     * @return Collection<Ulid, Ticket>
      */
     public function getChildrens(): Collection
     {
@@ -193,28 +208,15 @@ class Ticket
         return $this;
     }
 
-    public function getDeletedAt(): ?\DateTimeInterface
+    public function setIsDeleted(?bool $isDeleted): self
     {
-        return $this->deletedAt;
-    }
-
-    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
-    {
-        $this->deletedAt = $deletedAt;
-
+        $this->isDeleted = $isDeleted ? '1' : '0';
         return $this;
     }
 
-    public function getDeletedBy(): ?string
+    public function getIsDeleted(): ?bool
     {
-        return $this->deletedBy;
-    }
-
-    public function setDeletedBy(?string $deletedBy): self
-    {
-        $this->deletedBy = $deletedBy;
-
-        return $this;
+        return $this->isDeleted;
     }
 
     public function getStatus(): ?Status
@@ -230,7 +232,7 @@ class Ticket
     }
 
     /**
-     * @return Collection<int, Sprint>
+     * @return Collection<Ulid, Sprint>
      */
     public function getSprints(): Collection
     {

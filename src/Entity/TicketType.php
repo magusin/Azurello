@@ -7,19 +7,22 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: TicketTypeRepository::class)]
 class TicketType
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['ticketType'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['ticketType'])]
     #[ORM\Column(length: 45)]
-    private $name;
+    private $label;
 
     #[Groups(['ticketType_ticket'])]
     #[ORM\OneToMany(mappedBy: 'ticketType', targetEntity: Ticket::class)]
@@ -35,25 +38,25 @@ class TicketType
         $this->tickets = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getLabel(): ?string
     {
-        return $this->name;
+        return $this->label;
     }
 
-    public function setName(string $name): self
+    public function setLabel(string $label): self
     {
-        $this->name = $name;
+        $this->label = $label;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Ticket>
+     * @return Collection<Ulid, Ticket>
      */
     public function getTickets(): Collection
     {

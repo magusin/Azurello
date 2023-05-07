@@ -7,14 +7,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: SprintRepository::class)]
 class Sprint
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['sprint'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['sprint'])]
@@ -48,7 +51,7 @@ class Sprint
         $this->tickets = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -90,7 +93,7 @@ class Sprint
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<Ulid, User>
      */
     public function getUsers(): Collection
     {
@@ -114,7 +117,7 @@ class Sprint
     }
 
     /**
-     * @return Collection<int, Ticket>
+     * @return Collection<Ulid, Ticket>
      */
     public function getTickets(): Collection
     {

@@ -75,7 +75,7 @@ class TicketTypeController extends ControllerContext
 
     /* Specific ticketType details */
     #[Route('/ticket-type/{id}', name: 'ticketType_details', methods: ["HEAD", "GET"])]
-    public function ticketType(int $id): JsonResponse
+    public function ticketType(String $id): JsonResponse
     {
         $ticketType = $this->ticketTypeRepository->find($id);
 
@@ -100,7 +100,7 @@ class TicketTypeController extends ControllerContext
 
         // Check JSON body
         if (
-            empty($data["name"]) ||
+            empty($data["label"]) ||
             empty($data["project_id"])
         ) {
             return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
@@ -113,14 +113,14 @@ class TicketTypeController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
         $ticketType = new TicketType();
         $ticketType->setProject($project);
-        $ticketType->setName($data["name"]);
+        $ticketType->setLabel($data["label"]);
         $this->ticketTypeRepository->add($ticketType, true);
 
         return $this->json($ticketType, Response::HTTP_CREATED, [], ['groups' => [
@@ -133,7 +133,7 @@ class TicketTypeController extends ControllerContext
 
     /* Edit ticketType */
     #[Route('ticket-type/{id}', name: 'ticketType_edit', methods: ["PATCH"])]
-    public function editTicketType(Request $request, int $id): JsonResponse
+    public function editTicketType(Request $request, String $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $ticketType = $this->ticketTypeRepository->find($id);
@@ -143,8 +143,8 @@ class TicketTypeController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
         }
 
-        if (!empty($data['name'])) {
-            $ticketType->setName($data["name"]);
+        if (!empty($data['label'])) {
+            $ticketType->setLabel($data["label"]);
         }
 
         $this->ticketTypeRepository->add($ticketType, true);
@@ -159,7 +159,7 @@ class TicketTypeController extends ControllerContext
 
     /* Hard Delete ticketType */
     #[Route('/ticket-type/{id}', name: 'ticketType_delete', methods: ["DELETE"])]
-    public function deleteTicketType(int $id): JsonResponse
+    public function deleteTicketType(String $id): JsonResponse
     {
         $ticketType = $this->ticketTypeRepository->find($id);
 
@@ -170,6 +170,6 @@ class TicketTypeController extends ControllerContext
 
         $this->ticketTypeRepository->remove($ticketType, true);
 
-        return $this->json($this->successEntityDeleted("ticketType"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("ticketType"), Response::HTTP_OK);
     }
 }

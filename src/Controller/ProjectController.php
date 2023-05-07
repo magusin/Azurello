@@ -67,7 +67,7 @@ class ProjectController extends ControllerContext
         $projects = [];
         foreach ($userProjects as $userProject) {
             $project = $userProject->getProject();
-            if ($project->getDeletedAt() == null) {
+            if (!$project->getIsDeleted()) {
                 array_push($projects, $userProject->getProject());
             }
         }
@@ -92,10 +92,27 @@ class ProjectController extends ControllerContext
         ]]);
     }
 
+    /* List all Project soft deleted */
+    #[Route('/project-soft-deleted-list', name: 'project_soft_deleted_list', methods: ["HEAD", "GET"])]
+    public function projectSoftDeletedList(): JsonResponse
+    {
+        // Get all project for this user
+        $userProjects = $this->currentUser->getUserProjects();
+        $projects = [];
+        foreach ($userProjects as $userProject) {
+            $project = $userProject->getProject();
+            if ($project->getIsDeleted()) {
+                array_push($projects, $userProject->getProject());
+            }
+        }
+
+        return $this->json($projects, Response::HTTP_OK, [], ['groups' => 'project']);
+    }
+
 
     /* Specific Project details */
     #[Route('/project/{id}', name: 'project_details', methods: ["HEAD", "GET"])]
-    public function project(int $id): JsonResponse
+    public function project(String $id): JsonResponse
     {
         $project = $this->projectRepository->find($id);
 
@@ -109,8 +126,8 @@ class ProjectController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -149,21 +166,38 @@ class ProjectController extends ControllerContext
         $this->projectRepository->add($project, true);
 
         // Create defaut user type
-        $userType = new UserType();
-        $userType->setProject($project);
-        $userType->setLabel("Administrator");
-        $this->userTypeRepository->add($userType, true);
+        $userTypeOwner = new UserType();
+        $userTypeOwner->setProject($project);
+        $userTypeOwner->setLabel("Owner");
+        $userTypeOwner->setIsOwner(true);
+        $userTypeVisitor = new UserType();
+        $userTypeVisitor->setProject($project);
+        $userTypeVisitor->setLabel("Visitor");
+        $userTypeAdministrator = new UserType();
+        $userTypeAdministrator->setProject($project);
+        $userTypeAdministrator->setLabel("Administrator");
+        $userTypeAdministrator->setHasCreateSprintRule(true);
+        $userTypeAdministrator->setHasCreateTicketRule(true);
+        $userTypeAdministrator->setHasSoftDeleteTicketRule(true);
+        $userTypeAdministrator->setHasDeleteSprintRule(true);
+        $userTypeAdministrator->setHasUpdateSprintRule(true);
+        $userTypeAdministrator->setHasUpdateTicketRule(true);
+        $userTypeAdministrator->setHasAssignMemberRule(true);
+        $userTypeAdministrator->setHasInviteUserRule(true);
+        $this->userTypeRepository->add($userTypeOwner, true);
+        $this->userTypeRepository->add($userTypeVisitor, true);
+        $this->userTypeRepository->add($userTypeAdministrator, true);
 
         // Create defaut ticket type
         $ticketType = new TicketType();
         $ticketType->setProject($project);
-        $ticketType->setName("UserStory");
+        $ticketType->setLabel("UserStory");
         $ticketType2 = new TicketType();
         $ticketType2->setProject($project);
-        $ticketType2->setName("Bug");
+        $ticketType2->setLabel("Bug");
         $ticketType3 = new TicketType();
         $ticketType3->setProject($project);
-        $ticketType3->setName("Test");
+        $ticketType3->setLabel("Test");
         $this->ticketTypeRepository->add($ticketType, true);
         $this->ticketTypeRepository->add($ticketType2, true);
         $this->ticketTypeRepository->add($ticketType3, true);
@@ -186,7 +220,7 @@ class ProjectController extends ControllerContext
         $userProject = new UserProject();
         $userProject->setProject($project);
         $userProject->setUser($this->currentUser);
-        $userProject->setUserType($userType);
+        $userProject->setUserType($userTypeOwner);
         $this->userProjectRepository->add($userProject, true);
 
         return $this->json($project, Response::HTTP_CREATED, [], ['groups' => ['project']]);
@@ -195,7 +229,7 @@ class ProjectController extends ControllerContext
 
     /* Edit Project */
     #[Route('project/{id}', name: 'project_edit', methods: ["PATCH"])]
-    public function editProject(Request $request, int $id): JsonResponse
+    public function editProject(Request $request, String $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $project = $this->projectRepository->find($id);
@@ -205,8 +239,8 @@ class ProjectController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -232,8 +266,8 @@ class ProjectController extends ControllerContext
     }
 
     /* Soft Delete Project */
-    #[Route('/project/{id}', name: 'project_delete', methods: ["DELETE"])]
-    public function deleteProject(Request $request, int $id): JsonResponse
+    #[Route('/project-soft-delete/{id}', name: 'project_soft_delete', methods: ["PATCH"])]
+    public function softDeleteProject(String $id): JsonResponse
     {
         $project = $this->projectRepository->find($id);
 
@@ -242,15 +276,61 @@ class ProjectController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        $project->setDeletedAt(new DateTime());
-        $project->setDeletedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $project->setUpdatedAt(new DateTime());
+        $project->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $project->setIsDeleted(true);
         $this->projectRepository->add($project, true);
 
-        return $this->json($this->successEntityDeleted("project"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("project"), Response::HTTP_OK);
+    }
+
+    /* Restore soft deleted Project */
+    #[Route('/project-restore/{id}', name: 'project_restore', methods: ["PATCH"])]
+    public function restoreProject(String $id): JsonResponse
+    {
+        $project = $this->projectRepository->find($id);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if project is not soft deleted
+        if (!$project->getIsDeleted()) {
+            return $this->json($this->errorMessageEntityIsNotDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        $project->setUpdatedAt(new DateTime());
+        $project->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $project->setIsDeleted(false);
+        $this->projectRepository->add($project, true);
+
+        return $this->json($this->successMessageEntityRestored("project"), Response::HTTP_OK);
+    }
+
+    /* Hard Delete Project */
+    #[Route('/project/{id}', name: 'project_delete', methods: ["DELETE"])]
+    public function deleteProject(String $id): JsonResponse
+    {
+        $project = $this->projectRepository->find($id);
+
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if user have access to this project & this function
+        if (!$this->isUserHaveRight($this->currentUser, $project, "is_owner")) {
+            return $this->json($this->errorMessageNotAppropriateRight(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->projectRepository->remove($project, true);
+
+        return $this->json($this->successMessageEntityDeleted("project"), Response::HTTP_OK);
     }
 }

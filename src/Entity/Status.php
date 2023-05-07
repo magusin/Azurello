@@ -7,14 +7,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: StatusRepository::class)]
 class Status
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['status'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['status'])]
@@ -35,7 +38,7 @@ class Status
         $this->tickets = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -53,7 +56,7 @@ class Status
     }
 
     /**
-     * @return Collection<int, Ticket>
+     * @return Collection<Ulid, Ticket>
      */
     public function getTickets(): Collection
     {

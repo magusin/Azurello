@@ -10,30 +10,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class UserProject
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[Groups(['userProject'])]
-    #[ORM\Column(type: 'integer')]
-    private $id;
-
     #[Groups(['userProject_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private Project $project;
 
-    #[Groups(['userProject_details'])]
-    #[ORM\ManyToOne(targetEntity: UserType::class, inversedBy: 'userProjects')]
-    #[ORM\JoinColumn(nullable: false)]
-    private UserType $userType;
-
+    #[ORM\Id]
     #[Groups(['userProject_user'])]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'userProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    #[Groups(['userProject_details'])]
+    #[ORM\ManyToOne(targetEntity: UserType::class, inversedBy: 'userProjects')]
+    #[ORM\JoinColumn(nullable: false)]
+    private UserType $userType;
 
     public function getUser(): ?User
     {

@@ -53,7 +53,7 @@ class UserTypeController extends ControllerContext
 
     /* Specific UserType details */
     #[Route('/user-type/{id}', name: 'userType_details', methods: ["HEAD", "GET"])]
-    public function UserType(int $id): JsonResponse
+    public function UserType(String $id): JsonResponse
     {
         $userType = $this->userTypeRepository->find($id);
 
@@ -103,7 +103,7 @@ class UserTypeController extends ControllerContext
 
     /* Edit userType */
     #[Route('user-type/{id}', name: 'userType_edit', methods: ["PATCH"])]
-    public function editUserType(Request $request, int $id): JsonResponse
+    public function editUserType(Request $request, String $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $userType = $this->userTypeRepository->find($id);
@@ -126,7 +126,7 @@ class UserTypeController extends ControllerContext
 
     /* Hard Delete userType */
     #[Route('/user-type/{id}', name: 'userType_delete', methods: ["DELETE"])]
-    public function deleteUserType(int $id): JsonResponse
+    public function deleteUserType(String $id): JsonResponse
     {
         $userType = $this->userTypeRepository->find($id);
 
@@ -137,6 +137,6 @@ class UserTypeController extends ControllerContext
 
         $this->userTypeRepository->remove($userType, true);
 
-        return $this->json($this->successEntityDeleted("userType"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("userType"), Response::HTTP_OK);
     }
 }

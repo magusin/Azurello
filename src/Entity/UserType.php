@@ -7,19 +7,58 @@ use App\Repository\UserTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: UserTypeRepository::class)]
 class UserType
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['userType'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['userType'])]
     #[ORM\Column(type: 'string', length: 45)]
     private $label;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasCreateTicketRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasUpdateTicketRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasSoftDeleteTicketRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasCreateSprintRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasUpdateSprintRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasDeleteSprintRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasInviteUserRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $hasAssignMemberRule = false;
+
+    #[Groups(['project'])]
+    #[ORM\Column(type: 'boolean')]
+    private $isOwner = false;
 
     #[Groups(['userType_project'])]
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'userTypes')]
@@ -35,7 +74,7 @@ class UserType
         $this->userProjects = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -64,8 +103,107 @@ class UserType
         return $this;
     }
 
+    public function setHasCreateTicketRule(?bool $hasCreateTicketRule): self
+    {
+        $this->hasCreateTicketRule = $hasCreateTicketRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasCreateTicketRule(): ?bool
+    {
+        return $this->hasCreateTicketRule;
+    }
+
+    public function setHasUpdateTicketRule(?bool $hasUpdateTicketRule): self
+    {
+        $this->hasUpdateTicketRule = $hasUpdateTicketRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasUpdateTicketRule(): ?bool
+    {
+        return $this->hasUpdateTicketRule;
+    }
+
+    public function setHasSoftDeleteTicketRule(?bool $hasSoftDeleteTicketRule): self
+    {
+        $this->hasSoftDeleteTicketRule = $hasSoftDeleteTicketRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasSoftDeleteTicketRule(): ?bool
+    {
+        return $this->hasSoftDeleteTicketRule;
+    }
+
+    public function setHasCreateSprintRule(?bool $hasCreateSprintRule): self
+    {
+        $this->hasCreateSprintRule = $hasCreateSprintRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasCreateSprintRule(): ?bool
+    {
+        return $this->hasCreateSprintRule;
+    }
+
+    public function setHasUpdateSprintRule(?bool $hasUpdateSprintRule): self
+    {
+        $this->hasUpdateSprintRule = $hasUpdateSprintRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasUpdateSprintRule(): ?bool
+    {
+        return $this->hasUpdateSprintRule;
+    }
+
+    public function setHasDeleteSprintRule(?bool $hasDeleteSprintRule): self
+    {
+        $this->hasDeleteSprintRule = $hasDeleteSprintRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasDeleteSprintRule(): ?bool
+    {
+        return $this->hasDeleteSprintRule;
+    }
+
+    public function setHasInviteUserRule(?bool $hasInviteUserRule): self
+    {
+        $this->hasInviteUserRule = $hasInviteUserRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasInviteUserRule(): ?bool
+    {
+        return $this->hasInviteUserRule;
+    }
+
+    public function setHasAssignMemberRule(?bool $hasAssignMemberRule): self
+    {
+        $this->hasAssignMemberRule = $hasAssignMemberRule ? '1' : '0';
+        return $this;
+    }
+
+    public function getHasAssignMemberRule(): ?bool
+    {
+        return $this->hasAssignMemberRule;
+    }
+
+    public function setIsOwner(?bool $isOwner): self
+    {
+        $this->isOwner = $isOwner ? '1' : '0';
+        return $this;
+    }
+
+    public function getIsOwner(): ?bool
+    {
+        return $this->isOwner;
+    }
+
     /**
-     * @return Collection<int, UserProject>
+     * @return Collection<Ulid, UserProject>
      */
     public function getUserProjects(): Collection
     {

@@ -7,14 +7,17 @@ use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[Groups(['project'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "ulid", unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
     private $id;
 
     #[Groups(['project'])]
@@ -42,12 +45,8 @@ class Project
     private $updatedBy;
 
     #[Groups(['project'])]
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deletedAt;
-
-    #[Groups(['project'])]
-    #[ORM\Column(type: 'string', length: 45, nullable: true)]
-    private $deletedBy;
+    #[ORM\Column(type: 'boolean')]
+    private $isDeleted = false;
 
     #[Groups(['project_userType'])]
     #[ORM\OneToMany(targetEntity: UserType::class, mappedBy: "project")]
@@ -78,7 +77,7 @@ class Project
         $this->ticketTypes = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -155,32 +154,19 @@ class Project
         return $this;
     }
 
-    public function getDeletedAt(): ?\DateTimeInterface
+    public function setIsDeleted(?bool $isDeleted): self
     {
-        return $this->deletedAt;
-    }
-
-    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
-    {
-        $this->deletedAt = $deletedAt;
-
+        $this->isDeleted = $isDeleted ? '1' : '0';
         return $this;
     }
 
-    public function getDeletedBy(): ?string
+    public function getIsDeleted(): ?bool
     {
-        return $this->deletedBy;
-    }
-
-    public function setDeletedBy(?string $deletedBy): self
-    {
-        $this->deletedBy = $deletedBy;
-
-        return $this;
+        return $this->isDeleted;
     }
 
     /**
-     * @return Collection<int, UserType>
+     * @return Collection<Ulid, UserType>
      */
     public function getUserTypes(): Collection
     {
@@ -210,7 +196,7 @@ class Project
     }
 
     /**
-     * @return Collection<int, Status>
+     * @return Collection<Ulid, Status>
      */
     public function getStatus(): Collection
     {
@@ -240,7 +226,7 @@ class Project
     }
 
     /**
-     * @return Collection<int, UserProject>
+     * @return Collection<Ulid, UserProject>
      */
     public function getUserProjects(): Collection
     {
@@ -270,7 +256,7 @@ class Project
     }
 
     /**
-     * @return Collection<int, Sprint>
+     * @return Collection<Ulid, Sprint>
      */
     public function getSprints(): Collection
     {
@@ -300,7 +286,7 @@ class Project
     }
 
     /**
-     * @return Collection<int, TicketType>
+     * @return Collection<Ulid, TicketType>
      */
     public function getTicketTypes(): Collection
     {

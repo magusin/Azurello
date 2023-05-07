@@ -54,7 +54,7 @@ class TicketController extends ControllerContext
 
     /* List all ticket */
     #[Route('/ticket-list/{id}', name: 'ticket_list', methods: ["HEAD", "GET"])]
-    public function ticketList(int $id): JsonResponse
+    public function ticketList(String $id): JsonResponse
     {
         $project = $this->projectRepository->find($id);
 
@@ -63,8 +63,8 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -106,7 +106,7 @@ class TicketController extends ControllerContext
 
     /* Specific Ticket details */
     #[Route('/ticket/{id}', name: 'ticket_details', methods: ["HEAD", "GET"])]
-    public function ticket(int $id): JsonResponse
+    public function ticket(String $id): JsonResponse
     {
         $ticket = $this->ticketRepository->find($id);
 
@@ -115,8 +115,8 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if ticket is not deleted
-        if ($ticket->getDeletedBy(!null)) {
+        // Check if ticket is soft deleted
+        if ($ticket->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -154,8 +154,8 @@ class TicketController extends ControllerContext
         if (!$project) {
             return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
-        // Check if project is not deleted
-        if ($project->getDeletedBy(!null)) {
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -207,7 +207,7 @@ class TicketController extends ControllerContext
 
     /* Edit Ticket */
     #[Route('ticket/{id}', name: 'ticket_edit', methods: ["PATCH"])]
-    public function editTicket(Request $request, int $id): JsonResponse
+    public function editTicket(Request $request, String $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $ticket = $this->ticketRepository->find($id);
@@ -219,8 +219,8 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if ticket is not deleted
-        if ($ticket->getDeletedBy(!null)) {
+        // Check if ticket is soft deleted
+        if ($ticket->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
@@ -254,7 +254,7 @@ class TicketController extends ControllerContext
 
     /* Soft Delete ticket */
     #[Route('/ticket/{id}', name: 'ticket_delete', methods: ["DELETE"])]
-    public function deleteTicket(Request $request, int $id): JsonResponse
+    public function deleteTicket(Request $request, String $id): JsonResponse
     {
         $ticket = $this->ticketRepository->find($id);
 
@@ -263,15 +263,16 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
-        // Check if ticket is not deleted
-        if ($ticket->getDeletedBy(!null)) {
+        // Check if ticket is soft deleted
+        if ($ticket->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("ticket"), Response::HTTP_BAD_REQUEST);
         }
 
-        $ticket->setDeletedAt(new DateTime());
-        $ticket->setDeletedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $ticket->setUpdatedAt(new DateTime());
+        $ticket->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $ticket->setIsDeleted(true);
         $this->ticketRepository->add($ticket, true);
 
-        return $this->json($this->successEntityDeleted("ticket"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("ticket"), Response::HTTP_OK);
     }
 }

@@ -176,7 +176,7 @@ class UserController extends ControllerContext
 
     /* Hard Delete User */
     #[Route('/user/{id}', name: 'user_delete', methods: ["DELETE"])]
-    public function deleteUser(int $id): JsonResponse
+    public function deleteUser(String $id): JsonResponse
     {
         $user = $this->userRepository->find($id);
 
@@ -187,6 +187,6 @@ class UserController extends ControllerContext
 
         $this->userRepository->remove($user, true);
 
-        return $this->json($this->successEntityDeleted("user"), Response::HTTP_OK);
+        return $this->json($this->successMessageEntityDeleted("user"), Response::HTTP_OK);
     }
 }
