@@ -99,7 +99,7 @@ class Ticket
         return $this;
     }
 
-    public function getStoryPoints(): int
+    public function getStoryPoints(): ?int
     {
         return $this->storyPoints;
     }
