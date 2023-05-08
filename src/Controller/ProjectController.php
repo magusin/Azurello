@@ -134,10 +134,10 @@ class ProjectController extends ControllerContext
         return $this->json($project, Response::HTTP_OK, [], ['groups' => [
             'project',
             'project_userType', 'userType',
-            'project_userProject', 'userProject', 'userProject_user',
+            'project_userProject', 'userProject', 'userProject_user', 'user',
             'project_sprint', 'sprint',
             'project_status', 'status',
-            'project_ticketType', 'ticketType_ticket', 'ticket', 'ticket_children'
+            'project_ticketType', 'ticketType', 'ticketType_ticket', 'ticket', 'ticket_children'
         ]]);
     }
 
