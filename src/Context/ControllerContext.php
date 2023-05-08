@@ -44,6 +44,11 @@ class ControllerContext extends AbstractController
         return "Can not add a relation between $entityName and itself";
     }
 
+        protected function errorMessageRelationCycle(string $entityName)
+    {
+        return "Can not add a relation between the two $entityName, cycle error detected";
+    }
+
     protected function errorMessageNotAppropriateRight()
     {
         return "Can not use this function because of your rights on this project";

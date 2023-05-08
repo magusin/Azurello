@@ -25,7 +25,7 @@ class Ticket
     private $name;
 
     #[Groups(['ticket'])]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $storyPoints;
 
     #[Groups(['ticket_detail'])]

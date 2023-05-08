@@ -6,12 +6,14 @@ use DateTime;
 use App\Context\ControllerContext;
 use App\Entity\Ticket;
 use App\Entity\TicketType;
+use App\Entity\Project;
 use App\Repository\ProjectRepository;
 use App\Repository\StatusRepository;
 use App\Repository\TicketRepository;
 use App\Repository\TicketTypeRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -165,30 +167,22 @@ class TicketController extends ControllerContext
             return $this->json($this->errorMessageEntityNotFound("ticketType"), Response::HTTP_BAD_REQUEST);
         }
 
+        $ticket = new Ticket();
         if (!empty($data["ticket_parent_id"])) {
-            $parentTicket = $this->ticketRepository->find($data["ticket_parent_id"]);
-            // Check if ticket exists
-            if (!$parentTicket) {
-                return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
-            }
-            // Check if ticket in this project
-            $asTicket = false;
-            $project->getTicketTypes()->map(function (TicketType $ticketType) use (&$parentTicket, &$asTicket) {
-                if ($ticketType->getTickets()->contains($parentTicket)) {
-                    $asTicket = true;
-                }
-            });
-            if (!$asTicket) {
-                return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
+            $ticketParent = $this->ticketRepository->find($data["ticket_parent_id"]);
+            try {
+                $this->checkErrorCreateTicketChild($ticketParent, $project, $ticket);
+                $ticket->setParent($ticketParent);
+            } catch (InvalidArgumentException $ex) {
+                $errorMessage = $ex->getMessage();
+                return $this->json($errorMessage, Response::HTTP_BAD_REQUEST);
             }
         }
-
-        $ticket = new Ticket();
         $ticket->setName($data["name"]);
         $ticket->setStatus($project->getStatus()[0]);
         $ticket->setTicketType($ticketType);
-        if (!empty($data["ticket_parent_id"])) {
-            $ticket->setParent($parentTicket);
+        if (!empty($data["story_points"])) {
+            $ticket->setStoryPoints($data["story_points"]);
         }
         $ticket->setCreatedAt(new DateTime());
         $ticket->setCreatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
@@ -212,7 +206,9 @@ class TicketController extends ControllerContext
         $data = json_decode($request->getContent(), true);
         $ticket = $this->ticketRepository->find($id);
 
-        // Check if ticketParent != ticket
+        $project = $ticket->getTicketType()->getProject();
+
+        // Check if the user have right
 
         // Check if ticket exists
         if (!$ticket) {
@@ -228,6 +224,10 @@ class TicketController extends ControllerContext
             $ticket->setName($data["name"]);
         }
 
+        if (!empty($data["story_points"])) {
+            $ticket->setStoryPoints($data["story_points"]);
+        }
+
         if (!empty($data['status_id'])) {
             $status = $this->statusRepository->find($data["status_id"]);
             // Check if status exists
@@ -237,6 +237,48 @@ class TicketController extends ControllerContext
             $ticket->setStatus($status);
         }
 
+        if (!empty($data["ticket_parent_id"])) {
+            $ticketParent = $this->ticketRepository->find($data["ticket_parent_id"]);
+            try {
+                $this->checkErrorCreateTicketChild($ticketParent, $project, $ticket);
+                $ticket->setParent($ticketParent);
+            } catch (InvalidArgumentException $ex) {
+                $errorMessage = $ex->getMessage();
+                return $this->json($errorMessage, Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $ticket->setUpdatedAt(new DateTime());
+        $ticket->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
+        $this->ticketRepository->add($ticket, true);
+
+        return $this->json($ticket, Response::HTTP_OK, [], ['groups' => [
+            'ticket',
+            'ticket_status', 'status',
+            'ticket_sprint', 'sprint',
+            'ticket_ticketType', 'ticketType',
+            'ticket_user', 'user',
+            'ticket_task', 'task'
+        ]]);
+    }
+
+    /* Remove parent from ticket */
+    #[Route('/ticket-remove-parent/{id}', name: 'ticket_remove_parent', methods: ["PATCH"])]
+    public function removeTicketParent(String $id): JsonResponse
+    {
+        $ticket = $this->ticketRepository->find($id);
+
+        // Check if ticket exists
+        if (!$ticket) {
+            return $this->json($this->errorMessageEntityNotFound("ticket"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if ticket is soft deleted
+        if ($ticket->getIsDeleted()) {
+            return $this->json($this->errorMessageEntityIsDeleted("ticket"), Response::HTTP_BAD_REQUEST);
+        }
+
+        $ticket->setParent(null);
         $ticket->setUpdatedAt(new DateTime());
         $ticket->setUpdatedBy($this->currentUser->getFirstname() . " " . $this->currentUser->getLastname());
         $this->ticketRepository->add($ticket, true);
@@ -274,5 +316,34 @@ class TicketController extends ControllerContext
         $this->ticketRepository->add($ticket, true);
 
         return $this->json($this->successMessageEntityDeleted("ticket"), Response::HTTP_OK);
+    }
+
+    private function checkErrorCreateTicketChild(Ticket $ticketParent, Project $project, Ticket $ticket)
+    {
+        // Check if parent ticket exists
+        if (!$ticketParent) {
+            throw new InvalidArgumentException($this->errorMessageEntityNotFound("ticket"));
+        }
+        // Check if parent ticket in this project
+        $hasTicket = false;
+        foreach ($project->getTicketTypes() as $ticketType) {
+            if ($ticketType->getTickets()->contains($ticketParent)) {
+                $hasTicket = true;
+                break;
+            }
+        }
+        if (!$hasTicket) {
+            throw new InvalidArgumentException($this->errorMessageEntityNotFound("ticket"));
+        }
+        // Check if ticket is not the same as parent ticket
+        if ($ticket->getId() == $ticketParent->getId()) {
+            throw new InvalidArgumentException($this->errorMessageRelationItself("ticket"));
+        }
+        // Check if parent ticket is not a a child from the ticket
+        $ticket->getChildrens()->map(function (Ticket $ticketChild) use (&$ticketParent) {
+            if ($ticketChild->getId() == $ticketParent->getId()) {
+                throw new InvalidArgumentException($this->errorMessageRelationCycle("ticket"));
+            }
+        });
     }
 }
