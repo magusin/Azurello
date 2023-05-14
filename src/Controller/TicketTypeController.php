@@ -7,41 +7,65 @@ use App\Entity\TicketType;
 use App\Repository\ProjectRepository;
 use App\Repository\TicketRepository;
 use App\Repository\TicketTypeRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TicketTypeController extends ControllerContext
 {
     private $ticketRepository;
     private $ticketTypeRepository;
     private $projectRepository;
+    private $userRepository;
+    private $jwtManager;
+    private $tokenStorageInterface;
+    private $currentUser;
 
     public function __construct(
         TicketRepository $ticketRepository,
         TicketTypeRepository $ticketTypeRepository,
-        ProjectRepository $projectRepository
+        UserRepository $userRepository,
+        ProjectRepository $projectRepository,
+        TokenStorageInterface $tokenStorageInterface,
+        JWTTokenManagerInterface $jwtManager
     ) {
         $this->ticketRepository = $ticketRepository;
         $this->ticketTypeRepository = $ticketTypeRepository;
         $this->projectRepository = $projectRepository;
+        $this->userRepository = $userRepository;
+
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+        // Get user from the token
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+        $this->currentUser = $this->userRepository->findOneBy(array('email' => $decodedJwtToken['email']));
     }
 
 
     /* List all ticketType */
-    #[Route('/ticket-type-list', name: 'ticketType_list', methods: ["HEAD", "GET"])]
-    public function ticketTypeList(Request $request): JsonResponse
+    #[Route('/ticket-type-list/{id}', name: 'ticketType_list', methods: ["HEAD", "GET"])]
+    public function ticketTypeList(String $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $project = $this->projectRepository->find($id);
 
-        // Check JSON body
-        if (
-            empty($data["project_id"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
-        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if user have access to this project
+        if (!$this->isUserHaveRight($this->currentUser, $project)) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
 
         $ticketTypeList = $project->getTicketTypes();
 
@@ -51,17 +75,24 @@ class TicketTypeController extends ControllerContext
 
     /* List all ticketType on details */
     #[Route('/ticket-type-list-details', name: 'ticketType_list_details', methods: ["HEAD", "GET"])]
-    public function ticketTypeDetails(Request $request): JsonResponse
+    public function ticketTypeDetails(String $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $project = $this->projectRepository->find($id);
 
-        // Check JSON body
-        if (
-            empty($data["project_id"])
-        ) {
-            return $this->json($this->errorMessageJsonBody(), Response::HTTP_BAD_REQUEST);
+        // Check if project exists
+        if (!$project) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
-        $project = $this->projectRepository->find($data["project_id"]);
+
+        // Check if project is soft deleted
+        if ($project->getIsDeleted()) {
+            return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if user have access to this project
+        if (!$this->isUserHaveRight($this->currentUser, $project)) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
+        }
 
         $ticketTypeList = $project->getTicketTypes();
 
@@ -116,6 +147,11 @@ class TicketTypeController extends ControllerContext
         // Check if project is soft deleted
         if ($project->getIsDeleted()) {
             return $this->json($this->errorMessageEntityIsDeleted("project"), Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if user have access to this project
+        if (!$this->isUserHaveRight($this->currentUser, $project)) {
+            return $this->json($this->errorMessageEntityNotFound("project"), Response::HTTP_BAD_REQUEST);
         }
 
         $ticketType = new TicketType();
