@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\Sprint;
+use App\Entity\Status;
+use App\Entity\TicketType;
+use App\Entity\UserProject;
+use App\Entity\UserType;
+use Doctrine\ORM\EntityManagerInterface;
+
+class ProjectService
+{
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    public function deleteSprint(Sprint $sprint): void
+    {
+        $this->entityManager->remove($sprint);
+        $this->entityManager->flush();
+    }
+
+    public function deleteStatus(Status $status): void
+    {
+        $this->entityManager->remove($status);
+        $this->entityManager->flush();
+    }
+
+    public function deleteUserType(UserType $userType): void
+    {
+        $this->entityManager->remove($userType);
+        $this->entityManager->flush();
+    }
+
+    public function deleteUserProject(UserProject $userProject): void
+    {
+        $this->entityManager->remove($userProject);
+        $this->entityManager->flush();
+    }
+
+    public function deleteTicketType(TicketType $ticketType): void
+    {
+        $this->entityManager->remove($ticketType);
+        $this->entityManager->flush();
+    }
+}

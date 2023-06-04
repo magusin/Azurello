@@ -185,12 +185,7 @@ class Project
 
     public function removeUserType(UserType $userType): self
     {
-        if ($this->userTypes->removeElement($userType)) {
-            // set the owning side to null (unless already changed)
-            if ($userType->getProject() === $this) {
-                $userType->setProject(null);
-            }
-        }
+        $this->userTypes->removeElement($userType);
 
         return $this;
     }
@@ -215,12 +210,9 @@ class Project
 
     public function removeStatus(Status $status): self
     {
-        if ($this->status->removeElement($status)) {
-            // set the owning side to null (unless already changed)
-            if ($status->getProject() === $this) {
-                $status->setProject(null);
-            }
-        }
+        $this->status->removeElement($status);
+        // Suppression de la ligne à l'origine du bug
+        // $status->setProject(null);
 
         return $this;
     }
@@ -245,12 +237,7 @@ class Project
 
     public function removeUserProject(UserProject $userProject): self
     {
-        if ($this->userProjects->removeElement($userProject)) {
-            // set the owning side to null (unless already changed)
-            if ($userProject->getProject() === $this) {
-                $userProject->setProject(null);
-            }
-        }
+        $this->userProjects->removeElement($userProject);
 
         return $this;
     }
@@ -275,12 +262,7 @@ class Project
 
     public function removeSprint(Sprint $sprint): self
     {
-        if ($this->sprints->removeElement($sprint)) {
-            // set the owning side to null (unless already changed)
-            if ($sprint->getProject() === $this) {
-                $sprint->setProject(null);
-            }
-        }
+        $this->sprints->removeElement($sprint);
 
         return $this;
     }
@@ -305,12 +287,7 @@ class Project
 
     public function removeTicketType(TicketType $ticketType): self
     {
-        if ($this->ticketTypes->removeElement($ticketType)) {
-            // set the owning side to null (unless already changed)
-            if ($ticketType->getProject() === $this) {
-                $ticketType->setProject(null);
-            }
-        }
+        $this->ticketTypes->removeElement($ticketType);
 
         return $this;
     }
